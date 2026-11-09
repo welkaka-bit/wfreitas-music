@@ -178,19 +178,6 @@ main{max-width:1380px;margin:0 auto;padding:6px clamp(12px,3vw,28px) 0}
 .p2phint{font-size:.84rem;color:var(--muted);line-height:1.7}
 .p2phint.err{color:var(--err)}
 .p2phint .chip{margin:6px 8px 0 0}
-.p2pglob{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:10px 16px;margin:14px 0;font-size:.8rem;color:var(--muted)}
-.p2pglob b{color:var(--text);font-weight:500;font-variant-numeric:tabular-nums}
-.p2pglob label{display:flex;gap:6px;align-items:center}
-.p2pglob input[type=number]{width:72px;background:transparent;border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:4px 6px}
-.p2pst{font-size:.7rem;padding:2px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
-.p2pst.dl{color:var(--p)}.p2pst.sd{color:var(--ok)}.p2pst.ps{color:var(--warn)}
-.p2pdet{margin-top:10px;display:flex;flex-direction:column;gap:10px}
-.p2ppcs{width:100%;height:14px;border-radius:4px;background:rgba(255,255,255,.06)}
-.p2pkv{display:flex;gap:16px;flex-wrap:wrap;font-size:.74rem;color:var(--muted2)}.p2pkv code{font-size:.7rem;word-break:break-all}
-.p2pbtns{display:flex;gap:8px;flex-wrap:wrap}
-.p2ppeers{display:grid;grid-template-columns:1fr auto auto;gap:3px 14px;font-size:.74rem;color:var(--muted2);font-variant-numeric:tabular-nums}
-.pfiles{max-height:340px;overflow:auto}.pfile input[type=checkbox]{accent-color:var(--p);flex:0 0 auto}
-.pfile .pfp{font-size:.72rem;color:var(--muted2);min-width:36px;text-align:right}
 details.adv{border:1px dashed var(--line2);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:12px}
 details.adv summary{cursor:pointer;font-size:.86rem;font-weight:500;color:var(--muted)}
 details.adv summary:hover{color:var(--text)}
@@ -338,7 +325,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
     Fontes abertas e legais: <a href="https://audius.co" target="_blank" rel="noopener">Audius</a>,
     <a href="https://archive.org/details/audio" target="_blank" rel="noopener">Internet Archive</a>,
     <a href="https://openverse.org" target="_blank" rel="noopener">Openverse</a> e torrents do Archive via WebTorrent.<br>
-    YouTube: só <b>ouvir</b> (embed oficial) — o download de lá não é permitido pelos termos deles. Downloads para uso pessoal; apoie os artistas.
+    YouTube: <b>ouvir</b> pelo embed oficial e <b>baixar MP3</b> via API externa (pode falhar em vídeos restritos). Downloads para uso pessoal; apoie os artistas.
   </footer>
 </main>
 
@@ -507,7 +494,7 @@ function normOv(r) {
   return {
     id: 'o:' + r.id, src: 'ov', rid: r.id,
     title: r.title || 'Sem título', artist: r.creator || 'Desconhecido',
-    duration: Math.round((r.duration || 0) / 1000),      // Openverse entrega em milissegundos
+    duration: Math.round((r.duration || 0) / 1000),
     art: r.thumbnail || '', license: r.license ? String(r.license).toUpperCase() : '',
     url: r.url, name: 'x.' + (r.filetype || 'mp3'),
     permalink: r.foreign_landing_url || null, plays: 0, streamable: true
@@ -740,7 +727,7 @@ async function loadIA() {
 function iaAudioFiles(d, exts) {
   let f = (d.files || []).filter(x => x.name && exts.test(x.name) && !/_64kb\.mp3$/i.test(x.name));
   const mp3 = f.filter(x => /\.mp3$/i.test(x.name));
-  if (mp3.length) f = mp3;                       // evita listar original + derivados duplicados
+  if (mp3.length) f = mp3;
   return f.sort((a, b) => (parseInt(a.track) || 0) - (parseInt(b.track) || 0) || a.name.localeCompare(b.name, undefined, { numeric: true }));
 }
 function mkIATrack(item, f) {
@@ -766,7 +753,7 @@ async function loadAlbums() {
   } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Falha ao carregar álbuns: ' + (e && e.message)); }
 }
 
-/* ---------- Jamendo (Creative Commons, download liberado pelos artistas) ---------- */
+/* ---------- Jamendo ---------- */
 const JAM_TAGS = { 'Eletrônica':'electronic', 'Rock':'rock', 'Pop':'pop', 'Jazz':'jazz', 'Hip-Hop':'hiphop', 'Rap':'hiphop', 'Reggae':'reggae', 'Metal':'metal', 'Soul':'soul', 'Clássica':'classical', 'Lo-Fi':'lofi', 'Bossa Nova':'bossanova', 'Funk':'funk' };
 const jamCache = new Map();
 function jamLicense(u) {
@@ -775,14 +762,14 @@ function jamLicense(u) {
 }
 function normJam(r) {
   if (!r || !r.id || !r.audio) return null;
-  if (r.audiodownload_allowed === false) return null;     // só entra o que o artista liberou para baixar
+  if (r.audiodownload_allowed === false) return null;
   return {
     id: 'j:' + r.id, src: 'jam', rid: r.id,
     title: r.name || 'Sem título', artist: r.artist_name || 'Desconhecido',
     duration: +r.duration || 0, art: r.image || '', plays: 0, streamable: true,
     license: jamLicense(r.license_ccurl),
-    url: r.audio,                                          // streaming
-    dl: r.audiodownload || r.audio,                        // arquivo para baixar
+    url: r.audio,
+    dl: r.audiodownload || r.audio,
     name: 'x.mp3', permalink: r.shareurl || null
   };
 }
@@ -817,9 +804,9 @@ async function loadJam() {
   } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Jamendo indisponível (' + (e && e.message) + '). Confira o client_id nas Configurações.'); }
 }
 
-/* ---------- busca unificada: dedupe + intercalação ---------- */
+/* ---------- busca unificada ---------- */
 const dupKey = t => (String(t.artist || '') + '|' + String(t.title || '')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
-function unify(groups) {            // groups em ordem de prioridade (Jamendo, Audius, Openverse...); álbuns vão para o fim
+function unify(groups) {
   const seen = new Set(), tracks = [], albums = [];
   const lists = groups.map(g => g.filter(t => { if (isAlbum(t)) { albums.push(t); return false; } return true; }));
   const max = Math.max(0, ...lists.map(l => l.length));
@@ -968,7 +955,7 @@ function mediaSession(t) {
   navigator.mediaSession.setActionHandler('nexttrack', () => step(1));
 }
 function step(dir, auto) {
-  if (!cur || cur.src === 'p2p') return;          // faixas P2P avulsas não têm fila
+  if (!cur || cur.src === 'p2p') return;
   const base = (pqueue && pqueue.length) ? pqueue : state.tracks;
   const list = base.filter(t => !isAlbum(t) && t.src !== 'p2p');
   if (!list.length) return;
@@ -977,7 +964,7 @@ function step(dir, auto) {
   if (shuffle && list.length > 1) { do { n = Math.floor(Math.random() * list.length); } while (n === i); }
   else {
     n = i < 0 ? 0 : i + dir;
-    if (n >= list.length) { if (auto && repeat !== 'all') return; n = 0; }   // fim da fila: para, a menos que "repetir tudo"
+    if (n >= list.length) { if (auto && repeat !== 'all') return; n = 0; }
     if (n < 0) n = list.length - 1;
   }
   playTrack(list[n]);
@@ -1035,7 +1022,7 @@ document.addEventListener('keydown', e => {
   else if (e.code === 'ArrowLeft' && audio.duration) audio.currentTime = Math.max(0, audio.currentTime - 10);
 });
 
-/* ---------- downloads (fila + log estilo yt-dlp) ---------- */
+/* ---------- downloads ---------- */
 const dls = new Map();
 let dlq = [], active = 0;
 const logs = [];
@@ -1112,7 +1099,6 @@ async function runDl(d) {
   } catch (e) {
     if (d.status === 'cancelado') { logLine('[info] ' + d.id + ': cancelado', 'w'); }
     else if (e && e.name === 'TypeError') {
-      /* CORS/rede: o servidor não permite fetch — entrega o download ao próprio navegador */
       logLine('[warn] ' + d.id + ': fetch bloqueado (CORS/rede) — abrindo pelo navegador', 'w');
       openDirect(url, name);
       d.status = 'ok'; d.pct = 1; d.note = 'aberto no navegador';
@@ -1203,7 +1189,7 @@ window.addEventListener('beforeunload', e => {
   if (dlAtivo || p2pAtivo) { e.preventDefault(); e.returnValue = ''; }
 });
 
-/* ---------- aba Link (estilo yt-dlp / Seal) ---------- */
+/* ---------- aba Link ---------- */
 const AUDIO_EXT = /\.(mp3|m4a|aac|ogg|opus|wav|flac)(\?|#|$)/i;
 function renderLink() {
   head('Colar link', 'Cole o endereço e baixe — o MusiTop identifica a fonte sozinho', false);
@@ -1214,7 +1200,7 @@ function renderLink() {
         <button class="btn ghost" type="button" id="pastebtn">${I.paste} Colar</button>
         <button class="btn filled" type="submit">Analisar</button>
       </form>
-      <div class="suprow"><span class="tag">Audius</span><span class="tag alt">Internet Archive</span><span class="tag alt">Link direto de áudio</span><span class="tag p2p">Magnet / .torrent</span><span class="tag">YouTube: só ouvir</span></div>
+      <div class="suprow"><span class="tag">Audius</span><span class="tag alt">Internet Archive</span><span class="tag alt">Link direto de áudio</span><span class="tag p2p">Magnet / .torrent</span><span class="tag">YouTube: ouvir e baixar</span></div>
       <p class="hint">O arquivo é baixado no <b>formato original</b> da fonte (sem conversão — o navegador não roda ffmpeg). Playlists e álbuns mostram a lista de faixas com <b>Baixar tudo</b>.</p>
     </div><div id="linkres"></div>`;
   const inp = $('#linkin');
@@ -1247,8 +1233,11 @@ async function resolveLink(raw) {
   }
   const yid = /youtu/i.test(url) ? ytId(url) : null;
   if (yid) {
-    box.innerHTML = `<div class="panel"><p class="note"><b>YouTube:</b> o download de lá não é permitido pelos termos do YouTube, então aqui só dá para <b>ouvir</b> (embed oficial). Para baixar, busque a faixa nas outras fontes.</p>
+    box.innerHTML = `<div class="panel"><p class="note"><b>YouTube:</b> baixar pode violar os termos deles. Use com responsabilidade. Abaixo você pode <b>ouvir</b> e <b>baixar MP3</b> (a API pode falhar em vídeos restritos).</p>
       ${ytEmbed(yid)}</div>`;
+    // Liga o botão de download (criado dinamicamente)
+    const btn = box.querySelector('#yt-download-btn');
+    if (btn) btn.onclick = () => downloadFromYouTube(btn.dataset.vid, btn);
     return;
   }
   box.innerHTML = linkLoading;
@@ -1297,7 +1286,7 @@ async function resolveLink(raw) {
       showLinkTracks(box, t.title, 'Arquivo de áudio · ' + host, '', [t]);
       return;
     }
-    throw new Error('fonte não suportada. Aceito: Audius, Internet Archive, link direto de áudio, magnet/.torrent');
+    throw new Error('fonte não suportada. Aceito: YouTube, Audius, Internet Archive, link direto de áudio, magnet/.torrent');
   } catch (e) {
     if (g !== gen) return;
     box.innerHTML = `<div class="panel"><p class="note err">Não consegui analisar este link: ${esc((e && e.message) || 'erro')}.</p></div>`;
@@ -1328,7 +1317,7 @@ function loadWebTorrent() {
   return wtLoading;
 }
 function p2pClient() {
-  if (!wtClient) { wtClient = new window.WebTorrent({ maxConns: 80 }); wtClient.on('error', e => console.warn('[p2p]', e && e.message)); applyLimits(); }
+  if (!wtClient) { wtClient = new window.WebTorrent(); wtClient.on('error', e => console.warn('[p2p]', e && e.message)); }
   return wtClient;
 }
 function addViaClient(client, src, ms = 60000) {
@@ -1336,7 +1325,7 @@ function addViaClient(client, src, ms = 60000) {
     let done = false, t;
     const fin = (f, v) => { if (done) return; done = true; clearTimeout(tm); f(v); };
     const tm = setTimeout(() => { try { if (t) client.remove(t); } catch {} fin(rej, new Error('tempo esgotado esperando o torrent (sem peers/webseed)')); }, ms);
-    try { t = client.add(src, { announce: WSS_TRACKERS }, tor => fin(res, tor)); } catch (e) { fin(rej, e); return; }
+    try { t = client.add(src, tor => fin(res, tor)); } catch (e) { fin(rej, e); return; }
     t.on('error', e => fin(rej, e));
   });
 }
@@ -1382,173 +1371,31 @@ async function addP2P(raw) {
     logLine('ERROR: p2p: ' + ((e && e.message) || 'erro'), 'e');
   } finally { p2pBusy = false; }
 }
-/* ---------- P2P v2: cliente completo (pausa, limites, peers, peças, seleção de arquivos, semear, sessão) ---------- */
-const WSS_TRACKERS = ['wss://tracker.openwebtorrent.com', 'wss://tracker.webtorrent.dev', 'wss://tracker.btorrent.xyz', 'wss://tracker.files.fm:7073/announce'];
-const P2P_KEY = 'musitop.p2p.v1', P2P_LIM = 'musitop.p2p.lim', AUD_RE = /\.(mp3|m4a|ogg|opus|wav|flac)$/i;
-let p2pRestoring = false;
-const b64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
-const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
-const itOfTorrent = t => [...p2pItems.values()].find(i => i.torrent === t);
-function p2pSave() {
-  if (p2pRestoring) return;
-  try {
-    const arr = [];
-    for (const it of p2pItems.values()) {
-      if (it.seeded) continue;                      // arquivos semeados do disco não podem ser restaurados
-      const t = it.torrent, tf = t.torrentFile, e = { paused: !!it.paused, off: [...it.off] };
-      if (tf && tf.length < 400000) e.tf = b64(tf); else if (t.magnetURI) e.mg = t.magnetURI; else continue;
-      arr.push(e);
-    }
-    localStorage.setItem(P2P_KEY, JSON.stringify(arr.slice(-30)));
-  } catch {}
-}
-async function p2pRestore() {
-  let arr; try { arr = JSON.parse(localStorage.getItem(P2P_KEY) || '[]'); } catch { return; }
-  if (!arr.length) return;
-  p2pRestoring = true;
-  try {
-    await loadWebTorrent(); p2pClient();
-    let n = 0;
-    for (const e of arr) {
-      try {
-        const it = registerP2PTorrent(await addViaClient(p2pClient(), e.tf ? unb64(e.tf) : e.mg, 30000), null, { quiet: true });
-        if (it) { (e.off || []).forEach(i => it.off.add(i)); p2pPause(it); n++; }
-      } catch {}
-    }
-    if (n) { toast(n + ' torrent(s) restaurado(s) — pausados; retome para baixar de novo', 'ok'); logLine('[info] p2p: sessão restaurada (' + n + ')', 'i'); }
-  } catch {} finally { p2pRestoring = false; p2pSave(); refreshP2PList(); }
-}
-function applyLimits() {
-  const c = wtClient; if (!c) return;
-  let l = { d: 0, u: 0 }; try { l = JSON.parse(localStorage.getItem(P2P_LIM) || '') || l; } catch {}
-  try { c.throttleDownload(l.d > 0 ? l.d * 1024 : -1); c.throttleUpload(l.u > 0 ? l.u * 1024 : -1); } catch {}
-}
-function p2pApplySel(it) { (it.torrent.files || []).forEach((f, i) => { try { it.off.has(i) ? f.deselect() : f.select(); } catch {} }); }
-function p2pPause(it) { it.paused = true; try { it.torrent.pause(); } catch {} try { it.torrent.deselect(0, it.torrent.pieces.length - 1, 0); } catch {} p2pSave(); }
-function p2pResume(it) { it.paused = false; try { it.torrent.resume(); } catch {} p2pApplySel(it); p2pSave(); }
-function p2pToggleFile(it, idx) { it.off.has(idx) ? it.off.delete(idx) : it.off.add(idx); if (!it.paused) p2pApplySel(it); p2pSave(); }
-function p2pAudioOnly(it) { it.off.clear(); (it.torrent.files || []).forEach((f, i) => { if (!AUD_RE.test(f.name)) it.off.add(i); }); if (!it.paused) p2pApplySel(it); p2pSave(); }
-function p2pStats(it) {
-  const t = it.torrent, fs = t.files || []; let tot = 0, got = 0;
-  fs.forEach((f, i) => { if (!it.off.has(i)) { tot += f.length; got += f.downloaded || 0; } });
-  const pct = !fs.length ? 0 : tot ? Math.min(1, got / tot) : 1, dl = t.downloadSpeed || 0, left = tot - got;
-  const wires = t.wires || [], ws = wires.filter(w => w.type === 'webSeed').length, peers = wires.length - ws;
-  let st = 'Conectando...', cls = '';
-  if (it.paused) { st = 'Pausado'; cls = 'ps'; }
-  else if (!t.ready) st = 'Metadados...';
-  else if (pct >= 1) { st = it.seeded || t.numPeers ? 'Semeando' : 'Concluído'; cls = 'sd'; }
-  else if (dl > 0) { st = 'Baixando'; cls = 'dl'; }
-  return { pct, dl, ul: t.uploadSpeed || 0, eta: dl > 0 && left > 0 ? left / dl : Infinity, st, cls, peers, ws, ratio: t.downloaded ? (t.uploaded / t.downloaded).toFixed(2) : '—' };
-}
-function p2pMetaHtml(it) {
-  const s = p2pStats(it), t = it.torrent, ab = it.files.reduce((a, f) => a + (f.size || 0), 0);
-  return `<span>${Math.round(s.pct * 100)}%</span><span>↓ ${fmtSp(s.dl)}</span><span>↑ ${fmtSp(s.ul)}</span><span>ETA ${fmtETA(s.eta)}</span><span>${s.peers} peers${s.ws ? ' + ' + s.ws + ' webseed' : ''}</span><span>${fmtMB(t.downloaded)} ↓ · ${fmtMB(t.uploaded)} ↑</span><span>razão ${s.ratio}</span><span>${it.files.length} faixa(s) · ${fmtMB(ab)} · total ${fmtMB(t.length)}</span>`;
-}
-function p2pPeersHtml(t) {
-  const w = (t.wires || []).slice().sort((a, b) => b.downloadSpeed() - a.downloadSpeed()).slice(0, 12);
-  return w.length ? w.map(x => `<span>${x.type === 'webSeed' ? 'Webseed' : 'WebRTC'} · ${esc(x.remoteAddress || (x.peerId ? String(x.peerId).slice(0, 10) : '—'))}</span><span>↓ ${fmtSp(x.downloadSpeed())}</span><span>↑ ${fmtSp(x.uploadSpeed())}</span>`).join('') : '<span>Nenhum peer conectado</span>';
-}
-let p2pAccent = '';
-function p2pDrawPieces(cv, t) {
-  try {
-    const n = (t.pieces || []).length; if (!n || !t.bitfield) return;
-    if (!p2pAccent) p2pAccent = getComputedStyle(document.documentElement).getPropertyValue('--p').trim() || '#9be28b';
-    const W = cv.width = cv.clientWidth || 300, H = cv.height = 14, cols = Math.min(n, Math.floor(W / 3)), ctx = cv.getContext('2d');
-    ctx.clearRect(0, 0, W, H); ctx.fillStyle = p2pAccent;
-    for (let c = 0; c < cols; c++) {
-      const a = Math.floor(c * n / cols), b = Math.max(a + 1, Math.floor((c + 1) * n / cols)), step = Math.max(1, Math.floor((b - a) / 8));
-      let have = 0, tot = 0; for (let i = a; i < b; i += step) { tot++; if (t.bitfield.get(i)) have++; }
-      ctx.globalAlpha = tot ? 0.12 + 0.88 * have / tot : 0.12; ctx.fillRect(c * (W / cols), 0, Math.max(1, W / cols - 1), H);
-    }
-    ctx.globalAlpha = 1;
-  } catch {}
-}
-function p2pPaintRow(it, row) {
-  const s = p2pStats(it), bar = row.querySelector('.bar i'), m = row.querySelector('.p2pmeta'), st = row.querySelector('.p2pst');
-  if (bar) bar.style.width = Math.round(s.pct * 100) + '%';
-  if (m) m.innerHTML = p2pMetaHtml(it);
-  if (st) { st.textContent = s.st; st.className = 'p2pst ' + s.cls; }
-  if (!it.open) return;
-  const pe = row.querySelector('.p2ppeers'); if (pe) pe.innerHTML = p2pPeersHtml(it.torrent);
-  const cv = row.querySelector('.p2ppcs'); if (cv) p2pDrawPieces(cv, it.torrent);
-  row.querySelectorAll('.pfile[data-pfid]').forEach(r => { const pf = p2pFiles.get(r.dataset.pfid), p = r.querySelector('.pfp'); if (pf && p) p.textContent = Math.round((pf.file.progress || 0) * 100) + '%'; });
-}
-function p2pCard(it) {
-  const t = it.torrent, s = p2pStats(it);
-  const fileRow = pf => `<div class="pfile" data-pfid="${esc(pf.id)}"><input type="checkbox" data-pchk="${esc(pf.id)}" ${it.off.has(pf.idx) ? '' : 'checked'} aria-label="Baixar ${esc(pf.name)}">
-      <button class="ib sm" data-playp="${esc(pf.id)}" title="Ouvir" aria-label="Ouvir ${esc(pf.name)}">${I.play}</button>
-      <b title="${esc(pf.name)}">${esc(pf.name.replace(/^.*\//, ''))}</b><span class="pfp">${Math.round((pf.file.progress || 0) * 100)}%</span><span class="pfs">${fmtMB(pf.size)}</span>
-      <button class="ib sm dlb" data-dlp="${esc(pf.id)}" title="Baixar para o disco" aria-label="Baixar ${esc(pf.name)}">${I.dl}</button></div>`;
-  const det = it.open ? `<div class="p2pdet"><canvas class="p2ppcs" aria-label="Mapa de peças"></canvas>
-      <div class="p2pkv"><span>Hash <code>${esc(t.infoHash || '—')}</code></span><span>${(t.announce || []).length} trackers</span><span>${(t.pieces || []).length} peças</span></div>
-      <div class="p2pbtns"><button class="btn ghost sm" data-paud="${it.id}">Só áudio</button><button class="btn ghost sm" data-pall="${it.id}">Todos os arquivos</button></div>
-      <div class="p2ppeers">${p2pPeersHtml(t)}</div></div>` : '';
-  return `<div class="p2ptor" data-tid="${it.id}">
-    <div class="p2phead"><b title="${esc(it.name)}">${esc(it.name)}</b><span class="p2pst ${s.cls}">${s.st}</span>
-      <button class="btn ghost sm" data-ppause="${it.id}">${it.paused ? 'Retomar' : 'Pausar'}</button>
-      <button class="btn ghost sm" data-ptog="${it.id}">${it.open ? 'Menos' : 'Detalhes'}</button>
-      <button class="btn ghost sm" onclick="copyMagnetLive('${esc(it.id)}')" title="Copiar magnet deste torrent">Magnet</button>
-      <button class="ib sm" data-rm="${it.id}" title="Remover" aria-label="Remover torrent">${I.x}</button></div>
-    <div class="bar"><i style="width:${Math.round(s.pct * 100)}%"></i></div>
-    <div class="p2pmeta">${p2pMetaHtml(it)}</div>${det}
-    ${it.files.length ? `<div class="pfiles">${it.files.map(fileRow).join('')}</div>` : '<p class="pmore">Nenhum arquivo de áudio neste torrent.</p>'}
-  </div>`;
-}
-function p2pClick(e) {
-  const g = a => e.target.closest('[' + a + ']'); let x, it;
-  if ((x = g('data-ptog'))) { if ((it = p2pItems.get(x.dataset.ptog))) { it.open = !it.open; refreshP2PList(); } return true; }
-  if ((x = g('data-ppause'))) { if ((it = p2pItems.get(x.dataset.ppause))) { it.paused ? p2pResume(it) : p2pPause(it); refreshP2PList(); } return true; }
-  if ((x = g('data-paud'))) { if ((it = p2pItems.get(x.dataset.paud))) { p2pAudioOnly(it); refreshP2PList(); } return true; }
-  if ((x = g('data-pall'))) { if ((it = p2pItems.get(x.dataset.pall))) { it.off.clear(); if (!it.paused) p2pApplySel(it); p2pSave(); refreshP2PList(); } return true; }
-  if ((x = g('data-pchk'))) { const pf = p2pFiles.get(x.dataset.pchk); if (pf && (it = itOfTorrent(pf.torrent))) p2pToggleFile(it, pf.idx); return true; }
-  return false;
-}
-function p2pGlobHtml() {
-  let l = { d: 0, u: 0 }; try { l = JSON.parse(localStorage.getItem(P2P_LIM) || '') || l; } catch {}
-  return `<span>↓ <b id="gdl">—</b></span><span>↑ <b id="gul">—</b></span><span>Torrents <b id="gtn">0</b></span><span>Peers <b id="gpe">0</b></span><span>Razão <b id="grt">—</b></span>
-    <label>Limite ↓ <input type="number" min="0" id="glimd" value="${l.d || ''}" placeholder="∞"> KiB/s</label><label>↑ <input type="number" min="0" id="glimu" value="${l.u || ''}" placeholder="∞"> KiB/s</label>
-    <button class="btn tonal sm" type="button" id="p2pseedbtn">Semear arquivos</button><input type="file" id="p2pseedin" multiple accept="audio/*" hidden>`;
-}
-function p2pBindGlob() {
-  const sv = () => { try { localStorage.setItem(P2P_LIM, JSON.stringify({ d: +$('#glimd').value || 0, u: +$('#glimu').value || 0 })); } catch {} applyLimits(); };
-  $('#glimd').onchange = sv; $('#glimu').onchange = sv;
-  $('#p2pseedbtn').onclick = () => $('#p2pseedin').click();
-  $('#p2pseedin').onchange = e => { const fl = [...e.target.files]; e.target.value = ''; p2pSeed(fl).catch(err => toast('Erro ao semear: ' + ((err && err.message) || 'falha'), 'err')); };
-}
-async function p2pSeed(files) {
-  if (!files.length) return;
-  await loadWebTorrent();
-  const tor = await new Promise((res, rej) => { try { p2pClient().seed(files.length > 1 ? files : files[0], { announce: WSS_TRACKERS, name: files.length > 1 ? 'Semente ' + new Date().toLocaleDateString('pt-BR') : files[0].name }, res); } catch (e) { rej(e); } });
-  const it = registerP2PTorrent(tor, null, { seeded: true });
-  if (it) copyText(tor.magnetURI, 'Semeando! Magnet copiado — mantenha a aba aberta');
-}
-function registerP2PTorrent(torrent, say, opts = {}) {
+function registerP2PTorrent(torrent, say) {
   const id = 't' + (torrent.infoHash || Date.now().toString(36));
-  if (p2pItems.has(id)) { if (say) say('Este torrent já está na lista.'); return null; }
-  const it = { id, torrent, files: [], name: torrent.name || 'Torrent', off: new Set(), paused: false, open: false, seeded: !!opts.seeded };
+  if (p2pItems.has(id)) { if (say) say('Este torrent já está na lista.'); return; }
+  const it = { id, torrent, files: [], name: torrent.name || 'Torrent' };
   p2pItems.set(id, it);
   harvestP2PFiles(it);
   if (say) say('');
-  if (!opts.quiet) { logLine('[info] p2p: torrent adicionado — ' + it.name, 'i'); toast('Torrent adicionado: ' + it.name, 'ok'); }
-  torrent.on('done', () => { if (!it.paused) { toast('Download P2P concluído: ' + it.name, 'ok'); logLine('[info] p2p: concluído — ' + it.name, 'd'); } });
-  torrent.on('warning', w => logLine('[warn] p2p: ' + ((w && w.message) || w), 'w'));
-  refreshP2PList(); p2pSave();
-  return it;
+  logLine('[info] p2p: torrent adicionado — ' + it.name, 'i');
+  toast('Torrent adicionado: ' + it.name, 'ok');
+  torrent.on('done', () => { toast('Download P2P concluído: ' + it.name, 'ok'); logLine('[info] p2p: concluído — ' + it.name, 'd'); });
+  refreshP2PList();
 }
 function harvestP2PFiles(it) {
   for (const pf of it.files) p2pFiles.delete(pf.id);
-  it.files = [];
-  (it.torrent.files || []).forEach((f, idx) => {
-    if (!AUD_RE.test(f.name) || it.files.length >= 60) return;
-    const pf = { id: it.id + ':' + it.files.length, torrent: it.torrent, file: f, name: f.name, size: f.length, idx };
-    p2pFiles.set(pf.id, pf); it.files.push(pf);
+  it.files = (it.torrent.files || []).filter(f => /\.(mp3|m4a|ogg|opus|wav|flac)$/i.test(f.name)).slice(0, 60).map((f, i) => {
+    const pf = { id: it.id + ':' + i, torrent: it.torrent, file: f, name: f.name, size: f.length };
+    p2pFiles.set(pf.id, pf);
+    return pf;
   });
 }
 function removeP2P(id) {
   const it = p2pItems.get(id); if (!it) return;
   try { if (wtClient) wtClient.remove(it.torrent); } catch {}
   for (const pf of it.files) p2pFiles.delete(pf.id);
-  p2pItems.delete(id); p2pSave();
+  p2pItems.delete(id);
   refreshP2PList(); paintXfers();
 }
 function npFromP2P(pf) {
@@ -1560,7 +1407,6 @@ function npFromP2P(pf) {
 const webseedBase = (pf, httpsOnly) => (pf.torrent.urlList || []).map(u => String(u).replace(/^http:/i, 'https:')).find(u => /^https:/i.test(u) || (!httpsOnly && /^http:/i.test(u)));
 async function playP2P(pf) {
   const g = ++playGen;
-  { const it = itOfTorrent(pf.torrent); if (it && it.off.has(pf.idx)) { it.off.delete(pf.idx); if (!it.paused) p2pApplySel(it); p2pSave(); } }
   try {
     const base = webseedBase(pf, true);
     if (base) {
@@ -1599,6 +1445,20 @@ async function dlP2P(pf) {
     toast('Download P2P iniciado: ' + pf.name, 'ok');
   } catch (e) { toast('Erro no download P2P: ' + ((e && e.message) || 'erro'), 'err'); }
 }
+function p2pCard(it) {
+  const t = it.torrent, pct = Math.round((t.progress || 0) * 100), shown = it.files.slice(0, 30);
+  const audBytes = it.files.reduce((a, f) => a + (f.size || 0), 0);
+  const mixed = audBytes > 0 && audBytes < t.length * 0.25;
+  return `<div class="p2ptor" data-tid="${it.id}">
+    <div class="p2phead"><b title="${esc(it.name)}">${esc(it.name)}</b><button class="btn ghost sm" onclick="copyMagnetLive('${esc(it.id)}')" title="Copiar magnet deste torrent">Copiar magnet</button><button class="ib sm" data-rm="${it.id}" title="Remover" aria-label="Remover torrent">${I.x}</button></div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="p2pmeta"><span>${pct}%</span><span>${t.numPeers || 0} peers</span><span>${fmtMB(t.downloaded || 0)} baixados</span><span>${it.files.length} faixa(s) · ${fmtMB(audBytes)}</span>${mixed ? `<span>torrent total ${fmtMB(t.length)}</span>` : ''}</div>
+    ${shown.length ? `<div class="pfiles">${shown.map(pf => `<div class="pfile">
+        <button class="ib sm" data-playp="${esc(pf.id)}" title="Ouvir" aria-label="Ouvir ${esc(pf.name)}">${I.play}</button>
+        <b title="${esc(pf.name)}">${esc(pf.name.replace(/^.*\//, ''))}</b><span class="pfs">${fmtMB(pf.size)}</span>
+        <button class="ib sm dlb" data-dlp="${esc(pf.id)}" title="Baixar" aria-label="Baixar ${esc(pf.name)}">${I.dl}</button></div>`).join('')}</div>${it.files.length > 30 ? `<p class="pmore">+ ${it.files.length - 30} arquivos de áudio (use “Baixar faixas direto” no modal do álbum).</p>` : ''}` : '<p class="pmore">Nenhum arquivo de áudio neste torrent.</p>'}
+  </div>`;
+}
 const P2P_TAGS = ['Populares', 'Pagode', 'Samba', 'Rap', 'Funk', 'Sertanejo', 'MPB', 'Forró', 'Gospel', 'Jazz', 'Lo-Fi', 'Blues', 'Rock', 'Eletrônica'];
 function renderP2P(q) {
   head('P2P — álbuns completos', 'Busque um grupo, música ou álbum: baixo o disco inteiro via torrent com webseed do Archive', false);
@@ -1613,7 +1473,6 @@ function renderP2P(q) {
         <form class="frm" id="p2pform"><input id="p2pin" placeholder="magnet:?xt=... · https://.../album.torrent · identificador-do-archive.org" spellcheck="false" autocomplete="off" aria-label="Magnet, torrent ou identificador"><button class="btn tonal" type="submit">${I.dl} Adicionar</button></form>
         <button class="btn ghost" id="p2pfilebtn" type="button">${I.folder} Selecionar arquivo .torrent (ou arraste aqui)</button>
       </details></div>
-    <div class="p2pglob" id="p2pglob">${p2pGlobHtml()}</div>
     <h4 class="sub-h" id="p2preshd" hidden></h4><div id="p2presults"></div>
     <h4 class="sub-h" id="p2ptorshd" ${p2ps.length ? '' : 'hidden'}>Seus torrents (${p2ps.length})</h4>
     <div id="p2plist">${p2ps.map(p2pCard).join('')}</div>`;
@@ -1631,7 +1490,6 @@ function renderP2P(q) {
   };
   $('#p2pform').onsubmit = e => { e.preventDefault(); const v = $('#p2pin').value.trim(); if (v) { $('#p2pin').value = ''; addP2P(v); } };
   $('#p2pfilebtn').onclick = () => $('#p2pfile').click();
-  p2pBindGlob();
   const panel = view.querySelector('.panel');
   panel.addEventListener('dragover', e => e.preventDefault());
   panel.addEventListener('drop', e => { e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f && /\.torrent$/i.test(f.name)) addP2P(f); });
@@ -1767,7 +1625,6 @@ function iaTorrentSteps(item, say) {
   say('<b>Plano B</b> — <b>1)</b> <a class="chip" href="' + esc(torUrl) + '" target="_blank" rel="noopener">baixe o .torrent aqui</a> <b>2)</b> <button class="chip" type="button" id="p2ppick2">selecione o arquivo</button><br><span class="pmore">Depois disso o WebTorrent baixa o álbum inteiro via webseed do Archive.</span>', true);
   const pk = $('#p2ppick2'); if (pk) pk.onclick = () => $('#p2pfile').click();
 }
-/* ---------- links .torrent / magnet (acervo aberto do Internet Archive) ---------- */
 const torUrlOf = id => IA + '/download/' + encodeURIComponent(id) + '/' + encodeURIComponent(id + '_archive.torrent');
 async function copyText(txt, okMsg) {
   try { await navigator.clipboard.writeText(txt); toast(okMsg || 'Copiado!', 'ok'); return; } catch {}
@@ -1778,7 +1635,7 @@ async function copyText(txt, okMsg) {
   } catch {}
   window.prompt('Copie o link (Ctrl+C):', txt);
 }
-function infoDictBytes(buf) {            // leitor mínimo de bencode: devolve os bytes crus do dicionário "info"
+function infoDictBytes(buf) {
   const b = new Uint8Array(buf); let i = 1;
   const num = () => { let n = 0; while (b[i] !== 0x3a) { n = n * 10 + (b[i] - 48); i++; } i++; return n; };
   const skip = () => {
@@ -1811,7 +1668,7 @@ async function copyMagnetFor(item, btn) {
   } catch (e) { toast('Erro ao gerar o magnet: ' + ((e && e.message) || 'falha'), 'err'); }
   finally { if (btn) btn.disabled = false; }
 }
-function copyMagnetLive(id) {            // torrent já aberto no WebTorrent: o magnet vem pronto
+function copyMagnetLive(id) {
   const it = p2pItems.get(id);
   if (it && it.torrent && it.torrent.magnetURI) copyText(it.torrent.magnetURI, 'Magnet copiado!'); else toast('Magnet indisponível ainda', 'err');
 }
@@ -1847,34 +1704,107 @@ async function openP2PItemModal(item) {
   } catch (e) { list.innerHTML = '<div class="mempty">Erro ao carregar as faixas. Feche e tente de novo.</div>'; }
 }
 setInterval(() => {
-  if ($('#gdl')) {
-    const its = [...p2pItems.values()], c = wtClient;
-    let d = 0, u = 0, pe = 0; its.forEach(x => { d += x.torrent.downloaded || 0; u += x.torrent.uploaded || 0; pe += x.torrent.numPeers || 0; });
-    $('#gdl').textContent = c ? fmtSp(c.downloadSpeed) : '—'; $('#gul').textContent = c ? fmtSp(c.uploadSpeed) : '—';
-    $('#gtn').textContent = its.length; $('#gpe').textContent = pe; $('#grt').textContent = d ? (u / d).toFixed(2) : '—';
-  }
   if (!p2pItems.size) return;
-  for (const it of p2pItems.values()) $$('.p2ptor[data-tid="' + it.id + '"]').forEach(row => p2pPaintRow(it, row));
+  for (const it of p2pItems.values()) {
+    const pct = Math.round((it.torrent.progress || 0) * 100);
+    const ab = it.files.reduce((a, f) => a + (f.size || 0), 0);
+    const mix = ab > 0 && ab < it.torrent.length * 0.25;
+    $$('.p2ptor[data-tid="' + it.id + '"]').forEach(row => {
+      const bar = row.querySelector('.bar i'); if (bar) bar.style.width = pct + '%';
+      const m = row.querySelector('.p2pmeta');
+      if (m) m.innerHTML = `<span>${pct}%</span><span>${it.torrent.numPeers || 0} peers</span><span>${fmtMB(it.torrent.downloaded || 0)} baixados</span><span>${it.files.length} faixa(s) · ${fmtMB(ab)}</span>${mix ? `<span>torrent total ${fmtMB(it.torrent.length)}</span>` : ''}`;
+    });
+  }
 }, 900);
-/* a tela de transferências também atualiza o log/linhas em andamento */
 setInterval(() => { if (state.view === 'transfers' && [...dls.values()].some(d => d.status === 'baixando')) paintXfers(); }, 1000);
 
-/* ---------- YouTube (só ouvir) ---------- */
+/* ---------- YouTube: ouvir + baixar ---------- */
 function ytEmbed(id) {
   const watch = 'https://www.youtube.com/watch?v=' + id;
-  const link = `<a class="btn" href="${watch}" target="_blank" rel="noopener" style="display:inline-flex;margin-top:10px;text-decoration:none">Abrir no YouTube</a>`;
-  // Erro 153: o YouTube exige origem http(s) para embed. Em file:// (HTML aberto direto) o player sempre falha.
+  const dlBtn = `<button class="btn filled" id="yt-download-btn" data-vid="${esc(id)}" style="display:inline-flex;align-items:center;gap:8px">${I.dl} Baixar MP3</button>`;
+  // Em file:// o iframe de embed é bloqueado (erro 153), mas o download via API funciona.
   if (location.protocol === 'file:') {
-    const btn = `<a class="btn filled" href="${watch}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:10px 18px">Abrir no YouTube</a>`;
     return `<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:12px">
-      <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" style="width:200px;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#000" onerror="this.style.display='none'">
-      <div style="flex:1;min-width:240px"><div style="margin-bottom:10px">${btn}</div>
-      <p class="hint">O player embutido não roda com o arquivo aberto direto (<code>file://</code>, erro 153). Para tocar aqui dentro, abra por <code>http://localhost</code> (<code>python -m http.server</code>) ou hospede o app.</p></div></div>`;
+      <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" style="width:200px;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#000" onerror="this.style.display='none'">
+      <div style="flex:1;min-width:240px"><div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn filled" href="${esc(watch)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:10px 18px">Abrir no YouTube</a>
+        ${dlBtn}
+      </div>
+      <p class="hint">O player embutido não roda com o arquivo aberto direto (<code>file://</code>, erro 153). O botão <b>Baixar MP3</b> continua funcionando.</p></div></div>`;
   }
   const origin = encodeURIComponent(location.origin);
-  return `<div class="ytframe"><iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1&origin=${origin}" title="Player do YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-    <p class="hint" style="margin-top:8px">Não carregou? Alguns vídeos bloqueiam embed. ${link}</p>`;
+  return `<div class="ytframe"><iframe src="https://www.youtube.com/embed/${esc(id)}?autoplay=1&rel=0&playsinline=1&origin=${origin}" title="Player do YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <a class="btn" href="${esc(watch)}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px">Abrir no YouTube</a>
+      ${dlBtn}
+    </div>
+    <p class="hint" style="margin-top:8px">Não carregou o player? Alguns vídeos bloqueiam embed. O download usa uma API externa e pode falhar em vídeos restritos.</p>`;
 }
+
+async function downloadFromYouTube(videoId, btn) {
+  if (!videoId || !btn) return;
+  const orig = btn.innerHTML;
+  btn.disabled = true;
+  const setStatus = t => { btn.innerHTML = t; };
+
+  // Cada tentativa deve devolver { blob, ext } ou lançar erro.
+  const tryVevioz = async () => {
+    setStatus('⏳ Vevioz...');
+    const r = await fetchT('https://api.vevioz.com/@api/button/mp3/' + encodeURIComponent(videoId), 40000);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const b = await r.blob();
+    if (b.size < 30000) throw new Error('bloco muito pequeno (' + b.size + 'B)');
+    const ok = /audio|octet-stream/.test(b.type) || b.type === '';
+    if (!ok) throw new Error('tipo inesperado: ' + b.type);
+    return { blob: b, ext: '.mp3' };
+  };
+
+  const tryCobalt = async (host) => {
+    setStatus('⏳ ' + host.replace(/^https?:\/\//, '') + '...');
+    const r = await fetchT(host.replace(/\/$/, ''), 25000, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({ url: 'https://www.youtube.com/watch?v=' + videoId, isAudioOnly: true, vQuality: '720', filenameStyle: 'basic' })
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const j = await r.json();
+    const u = j.url || (j.picker && j.picker[0] && j.picker[0].url);
+    if (!u) throw new Error('sem url: ' + (j.status || 'desconhecido'));
+    const ar = await fetchT(u, 90000);
+    if (!ar.ok) throw new Error('download HTTP ' + ar.status);
+    const b = await ar.blob();
+    if (b.size < 30000) throw new Error('bloco muito pequeno');
+    return { blob: b, ext: '.mp3' };
+  };
+
+  try {
+    const methods = [
+      ['Vevioz', tryVevioz],
+      ['Cobalt (kwiatekmiki)', () => tryCobalt('https://cobalt-api.kwiatekmiki.com')],
+      ['Cobalt (eepy)', () => tryCobalt('https://co.eepy.today')]
+    ];
+    let result = null, lastErr = '';
+    for (const [name, fn] of methods) {
+      try {
+        result = await fn();
+        if (result) break;
+      } catch (e) {
+        lastErr = name + ': ' + ((e && e.message) || 'falha');
+        console.warn('[yt-dl] ' + lastErr);
+      }
+    }
+    if (!result) throw new Error(lastErr || 'nenhuma API respondeu');
+    const name = 'youtube_' + videoId + result.ext;
+    saveBlob(result.blob, name);
+    toast('Baixado: ' + name, 'ok');
+  } catch (e) {
+    toast('Não consegui baixar este vídeo (' + ((e && e.message) || 'erro') + '). Use um app externo como yt-dlp, ou copie o link e use um site como y2mate.', 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = orig;
+  }
+}
+
 function ytId(u) {
   const m = String(u || '').match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?[^#\s]*v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/);
   if (m) return m[1];
@@ -1882,8 +1812,8 @@ function ytId(u) {
   return /^[\w-]{11}$/.test(t) ? t : null;
 }
 function openYt() {
-  modal.innerHTML = `<div class="mhead"><div class="mi"><b>Ouvir do YouTube</b><span>embed oficial — sem download</span></div><button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>
-    <div class="mbody"><p class="note"><b>Sobre o YouTube:</b> os termos deles não permitem baixar vídeos/áudios, então aqui você só <b>ouve</b>. Para <b>baixar</b>, use Buscar, Link, Álbuns e P2P — fontes abertas e legais.</p>
+  modal.innerHTML = `<div class="mhead"><div class="mi"><b>Ouvir e baixar do YouTube</b><span>player oficial + extração de áudio</span></div><button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>
+    <div class="mbody"><p class="note"><b>Sobre o YouTube:</b> baixar pode violar os termos deles. Use com responsabilidade, apenas para conteúdo livre ou de sua autoria. O player embutido funciona no modo "Ouvir".</p>
     <form class="frm" id="ytform"><input id="yturl" placeholder="Cole o link do YouTube" spellcheck="false" autocomplete="off" aria-label="Link do YouTube"><button class="btn filled" type="submit">Ouvir</button></form><div id="ytbox"></div></div>`;
   openModal();
   $('#mclose').onclick = closeModal;
@@ -1893,10 +1823,15 @@ function openYt() {
     if (!id) { box.innerHTML = '<p class="note err">Link não reconhecido. Copie o endereço completo do vídeo.</p>'; return; }
     box.innerHTML = `${ytEmbed(id)}`;
   };
+  // Delegação de evento: o botão é criado dinamicamente pelo ytEmbed
+  $('#ytbox').addEventListener('click', e => {
+    const b = e.target.closest('#yt-download-btn');
+    if (b) downloadFromYouTube(b.dataset.vid, b);
+  });
 }
 $('#ytbtn').onclick = openYt;
 
-/* ---------- configurações (estilo Seal) ---------- */
+/* ---------- configurações ---------- */
 function openSettings() {
   modal.innerHTML = `<div class="mhead"><div class="mi"><b>Configurações</b><span>Ficam salvas neste navegador</span></div><button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>
     <div class="mbody">
@@ -1928,7 +1863,6 @@ view.addEventListener('error', e => {
 }, true);
 view.addEventListener('click', e => {
   if (e.target.closest('a')) return;
-  if (p2pClick(e)) return;
   const pp = e.target.closest('[data-playp]');
   if (pp) { const pf = p2pFiles.get(pp.dataset.playp); if (pf) playP2P(pf); return; }
   const pd = e.target.closest('[data-dlp]');
@@ -1966,7 +1900,7 @@ qInput.addEventListener('input', () => {
   qClear.hidden = !v; clearTimeout(debT);
   if (!v) { state.q = ''; if (state.view === 'link') return; route(); return; }
   if (v.length < 2) return;
-  if (/^(https?:\/\/|magnet:)/i.test(v)) return;       // links: só no Enter, para não disparar a cada tecla
+  if (/^(https?:\/\/|magnet:)/i.test(v)) return;
   debT = setTimeout(() => applyQuery(v), 450);
 });
 qInput.addEventListener('keydown', e => {
@@ -1997,7 +1931,6 @@ function route() {
   if (v === 'p2p') { renderP2P(state.q); return; }
   if (v === 'transfers') { renderTransfers(); return; }
   if (v === 'albums') { head('Álbuns completos', 'Coletâneas do Audius + álbuns inteiros do Acervo — clique em “Faixas”', true); loadAlbums(); return; }
-  /* v === 'search' */
   if (term) {
     head('“' + term + '”', 'Buscando nas fontes selecionadas ao mesmo tempo', true);
     searchAll(term);
@@ -2016,7 +1949,6 @@ window.addEventListener('online', () => toast('Conexão voltou!', 'ok'));
 (function init() {
   paintSrcs(); paintChips(); paintEras(); syncNav();
   $('#np-fav').innerHTML = I.heart;
-  setTimeout(p2pRestore, 2500);
   resolveHosts().then(() => { if (!hosts.length) toast('Audius fora do ar — use Acervo, Álbuns, Openverse ou P2P', 'err'); });
   route();
 })();
