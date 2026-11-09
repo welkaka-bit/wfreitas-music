@@ -26,8 +26,6 @@ button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
 a{color:inherit}
 img{display:block}
 [hidden]{display:none!important}
-
-/* ---------- app bar ---------- */
 .appbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;padding:10px clamp(12px,3vw,28px);background:rgba(14,18,16,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.2rem;white-space:nowrap}
 .lmark{width:34px;height:34px;border-radius:11px;background:var(--p);color:var(--onp);display:grid;place-items:center}
@@ -47,24 +45,18 @@ img{display:block}
 .ib.dlb:hover{background:var(--pc);color:var(--onpc)}
 .ib.sm{width:32px;height:32px}
 .ib.sm svg{width:16px;height:16px}
-
-/* ---------- nav ---------- */
 .nav{display:flex;gap:4px;overflow-x:auto;padding:10px clamp(12px,3vw,28px) 0;scrollbar-width:none;border-bottom:1px solid var(--line)}
 .nav::-webkit-scrollbar{display:none}
 .nav button{position:relative;padding:11px 16px 12px;font-size:.88rem;font-weight:500;color:var(--muted);white-space:nowrap;border-bottom:3px solid transparent;border-radius:8px 8px 0 0;display:inline-flex;gap:7px;align-items:center}
 .nav button:hover{color:var(--text);background:var(--s2)}
 .nav button.active{color:var(--p);border-bottom-color:var(--p)}
 .nbadge{min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--p);color:var(--onp);font-size:.68rem;font-weight:700;display:grid;place-items:center}
-
-/* ---------- filtros ---------- */
 .frow{display:flex;gap:8px;overflow-x:auto;padding:12px clamp(12px,3vw,28px) 0;scrollbar-width:none;align-items:center}
 .frow::-webkit-scrollbar{display:none}
 .flab{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted2);flex:0 0 auto;margin-right:2px}
 .chip{height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line2);font-size:.82rem;color:var(--muted);white-space:nowrap;flex:0 0 auto;display:inline-flex;align-items:center;text-decoration:none;transition:.15s}
 .chip:hover{color:var(--text);background:var(--s2)}
 .chip.active{background:var(--pc);color:var(--onpc);border-color:transparent;font-weight:500}
-
-/* ---------- conteúdo ---------- */
 main{max-width:1380px;margin:0 auto;padding:6px clamp(12px,3vw,28px) 0}
 .shead{display:flex;align-items:flex-end;gap:12px;margin:18px 2px 14px}
 .shead>div{flex:1;min-width:0}
@@ -79,8 +71,6 @@ main{max-width:1380px;margin:0 auto;padding:6px clamp(12px,3vw,28px) 0}
 .btn:hover{filter:brightness(1.12)}
 .btn.ghost:hover{color:var(--text);filter:none;background:var(--s2)}
 .btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
-
-/* lista estilo Soulseek */
 .list{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .lhead,.row{display:grid;grid-template-columns:44px minmax(0,1fr) 92px 112px 56px 130px;gap:10px;align-items:center;padding:8px 14px}
 .lhead{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);background:var(--s2);border-bottom:1px solid var(--line);padding-top:10px;padding-bottom:10px}
@@ -101,8 +91,6 @@ main{max-width:1380px;margin:0 auto;padding:6px clamp(12px,3vw,28px) 0}
 .c-act{display:flex;justify-content:flex-end;align-items:center;gap:2px}
 .tag{font-size:.68rem;font-weight:700;letter-spacing:.02em;padding:2px 8px;border-radius:6px;background:var(--s4);color:var(--muted);display:inline-block;white-space:nowrap}
 .tag.alt{color:var(--t)}.tag.cc{color:#b9e79b}.tag.p2p{color:#ffb2c0}.tag.ok{color:var(--ok)}
-
-/* grade */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:14px}
 .card{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:3px;transition:.18s;cursor:pointer}
 .card:hover{background:var(--s2);border-color:var(--line2);transform:translateY(-3px)}
@@ -117,8 +105,6 @@ main{max-width:1380px;margin:0 auto;padding:6px clamp(12px,3vw,28px) 0}
 .card .t-meta{display:flex;gap:8px;align-items:center;font-size:.72rem;color:var(--muted2);margin-top:3px;min-height:20px}
 .card .t-act{display:flex;gap:6px;align-items:center;margin-top:8px}
 .card .t-act .btn{flex:1}
-
-/* painéis */
 .panel{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
 .panel h3{display:flex;align-items:center;gap:9px;font-size:1.05rem;font-weight:500}
 .panel h3 svg{width:19px;height:19px;color:var(--p)}
@@ -143,12 +129,8 @@ main{max-width:1380px;margin:0 auto;padding:6px clamp(12px,3vw,28px) 0}
 .pmore{font-size:.8rem;color:var(--muted2);padding:4px 2px;line-height:1.6}
 .pmore b{color:var(--muted)}
 .sub-h{font-size:.95rem;font-weight:500;margin:20px 2px 10px}
-
-/* barra de progresso */
 .bar{height:5px;border-radius:3px;background:rgba(255,255,255,.09);overflow:hidden}
 .bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--p);transition:width .3s}
-
-/* transferências */
 .xlist{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
 .xhead,.xrow{display:grid;grid-template-columns:44px minmax(0,1fr) 110px 92px 62px 106px;gap:10px;align-items:center;padding:9px 14px}
 .xhead{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);background:var(--s2);border-bottom:1px solid var(--line)}
@@ -165,8 +147,6 @@ main{max-width:1380px;margin:0 auto;padding:6px clamp(12px,3vw,28px) 0}
 .tbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
 .console{background:#090c0a;border:1px solid var(--line);border-radius:12px;font:12px/1.6 'Roboto Mono',ui-monospace,monospace;max-height:260px;min-height:90px;overflow:auto;padding:12px 14px;white-space:pre-wrap;word-break:break-all;color:var(--muted)}
 .console .i{color:var(--t)}.console .d{color:var(--p)}.console .e{color:var(--err)}.console .w{color:var(--warn)}
-
-/* P2P */
 .p2ptor{background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
 .p2phead{display:flex;align-items:center;gap:10px;margin-bottom:9px}
 .p2phead b{flex:1;min-width:0;font-size:.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -182,8 +162,6 @@ details.adv{border:1px dashed var(--line2);border-radius:14px;padding:12px 16px;
 details.adv summary{cursor:pointer;font-size:.86rem;font-weight:500;color:var(--muted)}
 details.adv summary:hover{color:var(--text)}
 details.adv>*+*{margin-top:12px}
-
-/* drawer/ modal / toasts */
 .modal-ov{position:fixed;inset:0;z-index:65;background:rgba(4,6,5,.72);backdrop-filter:blur(5px);display:grid;place-items:center;padding:16px;opacity:0;pointer-events:none;transition:.2s}
 .modal-ov.open{opacity:1;pointer-events:auto}
 .modal{width:min(640px,100%);max-height:min(82vh,740px);display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--line2);border-radius:24px;overflow:hidden;transform:translateY(14px) scale(.97);transition:.22s;box-shadow:0 30px 80px rgba(0,0,0,.6)}
@@ -214,8 +192,6 @@ details.adv>*+*{margin-top:12px}
 .toast.ok{border-left:4px solid var(--ok)}.toast.err{border-left:4px solid var(--err)}
 .toast.out{opacity:0;transform:translateY(8px);transition:.3s}
 @keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-
-/* vazio / skeleton */
 .empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:64px 20px;color:var(--muted)}
 .empty .eico{width:70px;height:70px;border-radius:50%;background:var(--s2);display:grid;place-items:center}
 .empty .eico svg{width:32px;height:32px;color:var(--muted2)}
@@ -227,8 +203,6 @@ details.adv>*+*{margin-top:12px}
 @keyframes shine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
 .foot{margin:36px 0 10px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted2);font-size:.8rem;line-height:1.7;text-align:center}
 .foot a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted2)}
-
-/* player */
 .player{position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:minmax(200px,1fr) minmax(0,2fr) minmax(200px,1fr);align-items:center;gap:16px;padding:10px clamp(12px,3vw,28px);background:rgba(18,24,21,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);padding-bottom:max(10px,env(safe-area-inset-bottom))}
 .np{display:flex;align-items:center;gap:12px;min-width:0}
 .np-art{width:54px;height:54px;border-radius:12px;overflow:hidden;background:var(--s3);flex:0 0 auto;display:grid;place-items:center;color:var(--muted2)}
@@ -261,7 +235,6 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
 .viz i:nth-child(1){animation-delay:-.9s}.viz i:nth-child(2){animation-delay:-.7s}.viz i:nth-child(3){animation-delay:-.5s}.viz i:nth-child(4){animation-delay:-.3s}.viz i:nth-child(5){animation-delay:-.6s}
 @keyframes vz{from{height:16%}to{height:100%}}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
-
 @media(max-width:960px){
   .lhead,.row{grid-template-columns:44px minmax(0,1fr) 84px 52px 120px}
   .lhead .h-info,.row .c-info{display:none}
@@ -297,7 +270,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
     <button id="qclear" class="ib sm qclear" hidden aria-label="Limpar busca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <span class="spacer"></span>
-  <button id="ytbtn" class="ib" aria-label="Ouvir do YouTube" title="YouTube — ouvir e tentar baixar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.5 15.5v-7l6.3 3.5z"/></svg></button>
+  <button id="ytbtn" class="ib" aria-label="Ouvir do YouTube" title="YouTube — ouvir e baixar automático"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.5 15.5v-7l6.3 3.5z"/></svg></button>
   <button id="setbtn" class="ib" aria-label="Configurações" title="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
 </header>
 
@@ -325,7 +298,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
     Fontes abertas e legais: <a href="https://audius.co" target="_blank" rel="noopener">Audius</a>,
     <a href="https://archive.org/details/audio" target="_blank" rel="noopener">Internet Archive</a>,
     <a href="https://openverse.org" target="_blank" rel="noopener">Openverse</a> e torrents do Archive via WebTorrent.<br>
-    YouTube: <b>ouvir</b> e <b>tentar baixar</b> via APIs públicas (Piped/Invidious) — se falharem, o app guia o uso de extensão ou yt-dlp. Downloads para uso pessoal; apoie os artistas.
+    YouTube: <b>ouvir</b> e <b>baixar</b> com fallback automático (Piped → Invidious → Cobalt → API alternativa). Downloads para uso pessoal; apoie os artistas.
   </footer>
 </main>
 
@@ -366,12 +339,8 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
 'use strict';
 /* ================================================================
    MusiTop v2 — baixador de músicas 100% no navegador
-   UX: Soulseek (resultados em tabela + transferências), yt-dlp (link + log),
-       Seal (Material You + fila). Fontes: Jamendo, Audius, Internet Archive, Openverse, P2P.
-   YouTube: ouvir (embed) + tentar baixar via Piped/Invidious (fallback para extensão/yt-dlp).
    ================================================================ */
 
-/* ---------- utils ---------- */
 const $  = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 const esc = s => String(s ?? '').replace(/[&<>"'`]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
@@ -391,7 +360,6 @@ function fetchT(url, ms = 12000, opts = {}) {
   return fetch(url, { ...opts, signal: ctl.signal }).finally(() => clearTimeout(t));
 }
 
-/* ---------- ícones ---------- */
 const svg = (d, extra = '') => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' + extra + '>' + d + '</svg>';
 const I = {
   play:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
@@ -414,7 +382,6 @@ const I = {
   paste: svg('<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>')
 };
 
-/* ---------- estado ---------- */
 const APP = 'MusiTopWeb';
 const FALLBACK_HOSTS = ['https://api.audius.co', 'https://discoveryprovider.audius.co'];
 const IA = 'https://archive.org';
@@ -429,7 +396,6 @@ let gen = 0;
 const audio = $('#audio'), player = $('#player'), view = $('#view'), emptyBox = $('#empty');
 const qInput = $('#q'), qClear = $('#qclear');
 
-/* ---------- storage / config ---------- */
 const lsGet = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const cfg = Object.assign({ tpl:'artist-title', conc:2, layout:'list', jamId:'' }, lsGet('mt_cfg', {}));
@@ -448,7 +414,6 @@ function toast(msg, type = '') {
   setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 350); }, 3400);
 }
 
-/* ---------- Audius ---------- */
 async function resolveHosts() {
   try {
     const r = await fetchT('https://api.audius.co', 9000);
@@ -475,7 +440,6 @@ async function api(path, ms = 12000) {
   throw lastErr || new Error('sem conexão');
 }
 
-/* ---------- normalização ---------- */
 function normA(t) {
   if (!t || t.is_delete || !t.id) return null;
   const streamable = (t.is_streamable ?? true) !== false && (t.is_available ?? true) !== false;
@@ -515,7 +479,6 @@ function normPl(p) {
 const register = list => { for (const t of list) if (t && t.id) catalog.set(t.id, t); return list; };
 const isAlbum = t => t.src === 'iaitem' || t.src === 'pl' || t.src === 'p2pitem';
 
-/* ---------- URLs / nomes ---------- */
 function streamUrl(t) {
   if (t.url) return t.url;
   if (t.src === 'audius') return apiBase() + '/v1/tracks/' + encodeURIComponent(t.rid) + '/stream?app_name=' + APP;
@@ -532,7 +495,6 @@ function fileName(t) {
   return sanitize(base) + extOf(t);
 }
 
-/* ---------- navegação / filtros ---------- */
 const TAGS = ['', 'Pagode', 'Samba', 'Rap', 'Funk', 'Sertanejo', 'Forró', 'MPB', 'Bossa Nova', 'Axé', 'Choro', 'Gospel', 'Rock', 'Pop', 'Eletrônica', 'Hip-Hop', 'Lo-Fi', 'Jazz', 'Reggae', 'Metal', 'Soul', 'Clássica'];
 const SRCS = [['all','Todas'],['jam','Jamendo'],['audius','Audius'],['ia','Acervo'],['ov','Openverse']];
 const ERAS = {
@@ -582,7 +544,6 @@ function paintLayoutBtn() {
   b.title = state.layout === 'list' ? 'Ver em grade' : 'Ver em lista';
 }
 
-/* ---------- render: lista / grade ---------- */
 const srcLab = t => ({ jam:['Jamendo','cc'], audius:['Audius',''], pl:['Audius',''], ov:['Openverse','cc'], ia:['Acervo','alt'], iaitem:['Acervo','alt'], p2pitem:['P2P','p2p'], url:['Link','alt'] }[t.src] || ['Fonte','']);
 function rowHtml(t, D) {
   const alb = isAlbum(t), [lab, cls] = srcLab(t), fav = !alb && isFav(t.id), dled = D.has(t.id);
@@ -649,7 +610,6 @@ function head(title, sub, showLayout) {
   $('#layoutbtn').hidden = !showLayout;
 }
 
-/* ---------- carregamentos ---------- */
 async function loadTrending() {
   const g = setLoading();
   try {
@@ -682,7 +642,6 @@ async function searchAll(q) {
   if (!all.length) paintEmpty('error', 'Nada para “' + q + '” nas fontes selecionadas. Tente outro termo, outra fonte ou verifique a conexão.');
 }
 
-/* ---------- Internet Archive ---------- */
 async function iaSearchDocs(query) {
   const url = IA + '/advancedsearch.php?q=' + encodeURIComponent(query) +
     '&fl%5B%5D=identifier&fl%5B%5D=title&fl%5B%5D=creator&fl%5B%5D=year&sort%5B%5D=downloads+desc&rows=24&page=1&output=json';
@@ -739,7 +698,6 @@ function mkIATrack(item, f) {
   return t;
 }
 
-/* ---------- álbuns ---------- */
 async function loadAlbums() {
   const g = setLoading();
   try {
@@ -754,7 +712,6 @@ async function loadAlbums() {
   } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Falha ao carregar álbuns: ' + (e && e.message)); }
 }
 
-/* ---------- Jamendo ---------- */
 const JAM_TAGS = { 'Eletrônica':'electronic', 'Rock':'rock', 'Pop':'pop', 'Jazz':'jazz', 'Hip-Hop':'hiphop', 'Rap':'hiphop', 'Reggae':'reggae', 'Metal':'metal', 'Soul':'soul', 'Clássica':'classical', 'Lo-Fi':'lofi', 'Bossa Nova':'bossanova', 'Funk':'funk' };
 const jamCache = new Map();
 function jamLicense(u) {
@@ -805,7 +762,6 @@ async function loadJam() {
   } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Jamendo indisponível (' + (e && e.message) + '). Confira o client_id nas Configurações.'); }
 }
 
-/* ---------- busca unificada ---------- */
 const dupKey = t => (String(t.artist || '') + '|' + String(t.title || '')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 function unify(groups) {
   const seen = new Set(), tracks = [], albums = [];
@@ -819,7 +775,6 @@ function unify(groups) {
   return [...tracks, ...albums];
 }
 
-/* ---------- Openverse ---------- */
 const ovCache = new Map();
 async function ovSearch(q) {
   const key = String(q || '').toLowerCase().trim();
@@ -841,7 +796,6 @@ async function loadOV() {
   } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Openverse indisponível (' + (e && e.message) + '). Ele limita requisições por minuto — espere um instante.'); }
 }
 
-/* ---------- modais ---------- */
 const modalOv = $('#modal-ov'), modal = $('#modal');
 let lastModalTracks = [];
 function openModal() {
@@ -899,7 +853,6 @@ async function openIAModal(item) {
   } catch (e) { list.innerHTML = '<div class="mempty">Erro ao carregar as faixas. Feche e tente de novo.</div>'; }
 }
 
-/* ---------- favoritos ---------- */
 function toggleFav(t) {
   if (!t || t.src === 'p2p' || isAlbum(t)) { toast('Este item não pode ser favoritado'); return; }
   let f = getFavs();
@@ -920,7 +873,6 @@ function refreshFavUI() {
   if (state.view === 'favs') { state.tracks = getFavs(); register(state.tracks); paintGrid(); if (!state.tracks.length) paintEmpty('favs'); }
 }
 
-/* ---------- player ---------- */
 function playTrack(t, list) {
   if (!t) return;
   if (t.src === 'p2pitem') { openP2PItemModal(t); return; }
@@ -1023,7 +975,6 @@ document.addEventListener('keydown', e => {
   else if (e.code === 'ArrowLeft' && audio.duration) audio.currentTime = Math.max(0, audio.currentTime - 10);
 });
 
-/* ---------- downloads ---------- */
 const dls = new Map();
 let dlq = [], active = 0;
 const logs = [];
@@ -1128,7 +1079,6 @@ function refreshDledBadges() {
   });
 }
 
-/* ---------- tela de transferências ---------- */
 function xrowHtml(d) {
   const st = { fila:'Na fila', baixando: d.total ? Math.round(d.pct * 100) + '%' : 'Baixando', ok:'Concluído', erro:'Falhou', cancelado:'Cancelado' }[d.status];
   const sub = d.status === 'erro' ? d.err : d.status === 'baixando' ? (d.total ? mib(d.got) + ' / ' + mib(d.total) : mib(d.got)) : d.status === 'ok' ? (mib(d.total || d.got) + (d.note ? ' · ' + d.note : '')) : d.t.artist;
@@ -1190,7 +1140,6 @@ window.addEventListener('beforeunload', e => {
   if (dlAtivo || p2pAtivo) { e.preventDefault(); e.returnValue = ''; }
 });
 
-/* ---------- aba Link ---------- */
 const AUDIO_EXT = /\.(mp3|m4a|aac|ogg|opus|wav|flac)(\?|#|$)/i;
 function renderLink() {
   head('Colar link', 'Cole o endereço e baixe — o MusiTop identifica a fonte sozinho', false);
@@ -1201,7 +1150,7 @@ function renderLink() {
         <button class="btn ghost" type="button" id="pastebtn">${I.paste} Colar</button>
         <button class="btn filled" type="submit">Analisar</button>
       </form>
-      <div class="suprow"><span class="tag">Audius</span><span class="tag alt">Internet Archive</span><span class="tag alt">Link direto de áudio</span><span class="tag p2p">Magnet / .torrent</span><span class="tag">YouTube: ouvir e tentar baixar</span></div>
+      <div class="suprow"><span class="tag">Audius</span><span class="tag alt">Internet Archive</span><span class="tag alt">Link direto de áudio</span><span class="tag p2p">Magnet / .torrent</span><span class="tag">YouTube: ouvir e baixar</span></div>
       <p class="hint">O arquivo é baixado no <b>formato original</b> da fonte (sem conversão — o navegador não roda ffmpeg). Playlists e álbuns mostram a lista de faixas com <b>Baixar tudo</b>.</p>
     </div><div id="linkres"></div>`;
   const inp = $('#linkin');
@@ -1234,7 +1183,7 @@ async function resolveLink(raw) {
   }
   const yid = /youtu/i.test(url) ? ytId(url) : null;
   if (yid) {
-    box.innerHTML = `<div class="panel"><p class="note"><b>YouTube:</b> baixar pode violar os termos deles — use com responsabilidade. Você pode <b>ouvir</b> aqui e <b>tentar baixar</b> via APIs públicas (Piped/Invidious). Se todas falharem, o app mostra o caminho manual.</p>
+    box.innerHTML = `<div class="panel"><p class="note"><b>YouTube:</b> baixar pode violar os termos deles — use com responsabilidade. O botão <b>Baixar MP3</b> tenta automaticamente Piped → Invidious → Cobalt → API alternativa. Se todas falharem, o app mostra o caminho manual.</p>
       ${ytEmbed(yid)}</div>`;
     bindYtDownloadButton();
     return;
@@ -1292,7 +1241,6 @@ async function resolveLink(raw) {
   }
 }
 
-/* ---------- P2P via WebTorrent ---------- */
 const p2pItems = new Map(), p2pFiles = new Map();
 let wtClient = null, wtLoading = null, p2pBusy = false, playGen = 0;
 function loadWebTorrent() {
@@ -1718,22 +1666,34 @@ setInterval(() => {
 setInterval(() => { if (state.view === 'transfers' && [...dls.values()].some(d => d.status === 'baixando')) paintXfers(); }, 1000);
 
 /* ================================================================
-   YouTube: ouvir (embed) + baixar (Piped/Invidious com fallback)
+   YouTube: ouvir (embed) + baixar com 4 camadas de fallback automático
    ================================================================ */
 
-// Instâncias públicas de Piped e Invidious (podem cair — testamos várias em ordem)
+// Camada 1: Piped (mais estável)
 const YT_PIPED = [
   'https://pipedapi.kavin.rocks',
   'https://api.piped.private.coffee',
   'https://pipedapi.reallyaweso.me'
 ];
+
+// Camada 2: Invidious
 const YT_INVIDIOUS = [
   'https://inv.nadeko.net',
-  'https://invidious.nerdvpn.de',
-  'https://yewtu.be'
+  'https://invidious.nerdvpn.de'
 ];
 
-// Pede ao Piped o melhor stream de áudio e devolve o Blob
+// Camada 3: Cobalt (instâncias públicas monitoradas)
+const YT_COBALT = [
+  'https://cobalt-api.kwiatekmiki.com',
+  'https://cobalt-api.ayo.tf',
+  'https://cobalt.api.timelessnesses.me',
+  'https://cobalt-alpha.wolfy.love',
+  'https://nuko-c.meowing.de'
+];
+
+// Camada 4: API alternativa (último recurso)
+const YT_ALT = ['https://api.vevioz.com/@api/button/mp3/'];
+
 async function tryPiped(videoId) {
   for (const host of YT_PIPED) {
     try {
@@ -1775,59 +1735,107 @@ async function tryInvidious(videoId) {
   return null;
 }
 
+async function tryCobalt(videoId) {
+  for (const host of YT_COBALT) {
+    try {
+      const r = await fetchT(host.replace(/\/$/, '') + '/api/json', 25000, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({
+          url: 'https://www.youtube.com/watch?v=' + videoId,
+          vCodec: 'h264',
+          vQuality: '720',
+          aFormat: 'mp3',
+          filenamePattern: 'basic',
+          isAudioOnly: true
+        })
+      });
+      if (!r.ok) continue;
+      const j = await r.json();
+      const u = j.url || (j.picker && j.picker[0] && j.picker[0].url);
+      if (!u) continue;
+      const ar = await fetchT(u, 90000);
+      if (!ar.ok) continue;
+      const blob = await ar.blob();
+      if (blob.size < 30000) continue;
+      return { blob, ext: '.mp3' };
+    } catch (e) { console.warn('[cobalt]', host, e && e.message); }
+  }
+  return null;
+}
+
+async function tryAltApi(videoId) {
+  for (const base of YT_ALT) {
+    try {
+      const r = await fetchT(base + videoId, 40000);
+      if (!r.ok) continue;
+      const blob = await r.blob();
+      if (blob.size < 30000) continue;
+      const okType = /audio|octet-stream/.test(blob.type) || blob.type === '';
+      if (!okType) continue;
+      return { blob, ext: '.mp3' };
+    } catch (e) { console.warn('[alt]', base, e && e.message); }
+  }
+  return null;
+}
+
 async function downloadFromYouTube(videoId, btn) {
   if (!videoId || !btn) return;
   const orig = btn.innerHTML;
   btn.disabled = true;
-  const setStatus = t => { btn.innerHTML = t; };
 
-  try {
-    setStatus('⏳ Procurando stream...');
-    let result = await tryPiped(videoId);
-    if (!result) { setStatus('⏳ Tentando Invidious...'); result = await tryInvidious(videoId); }
+  const steps = [
+    { name: 'Piped', fn: tryPiped },
+    { name: 'Invidious', fn: tryInvidious },
+    { name: 'Cobalt', fn: tryCobalt },
+    { name: 'API alternativa', fn: tryAltApi }
+  ];
 
-    if (result) {
-      const name = 'youtube_' + videoId + result.ext;
-      saveBlob(result.blob, name);
-      toast('Baixado: ' + name, 'ok');
-      btn.disabled = false;
-      btn.innerHTML = orig;
-      return;
+  for (const step of steps) {
+    try {
+      btn.innerHTML = '⏳ ' + step.name + '...';
+      const result = await step.fn(videoId);
+      if (result) {
+        const name = 'youtube_' + videoId + result.ext;
+        saveBlob(result.blob, name);
+        toast('✅ Baixado: ' + name, 'ok');
+        btn.disabled = false;
+        btn.innerHTML = orig;
+        return;
+      }
+    } catch (e) {
+      console.warn('[yt-dl] ' + step.name + ' falhou:', e && e.message);
     }
+  }
 
-    // Falhou: mostra instruções claras dentro do modal
-    btn.disabled = false;
-    btn.innerHTML = orig;
-    const box = document.getElementById('ytbox');
-    if (box) {
-      box.insertAdjacentHTML('afterbegin', `
-        <div class="panel" style="margin-bottom:12px;border-color:var(--warn)">
-          <p class="note" style="margin:0">
-            <b>Não consegui baixar dentro do MusiTop agora.</b> As APIs públicas (Piped/Invidious) estão instáveis ou bloqueadas para este vídeo — o YouTube bloqueia ativamente.
-          </p>
-          <div class="tbar" style="margin-top:10px">
-            <a class="btn filled sm" href="https://www.youtube.com/watch?v=${esc(videoId)}" target="_blank" rel="noopener" style="text-decoration:none">
-              Abrir este vídeo no YouTube
-            </a>
-            <a class="btn ghost sm" href="https://addons.mozilla.org/pt-BR/firefox/addon/anydownload-media-downloader/" target="_blank" rel="noopener" style="text-decoration:none">
-              Instalar AnyDownload (Firefox)
-            </a>
-            <a class="btn ghost sm" href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener" style="text-decoration:none">
-              Ver yt-dlp no GitHub
-            </a>
-          </div>
-          <p class="hint" style="margin-top:10px;margin-bottom:0">
-            <b>Como fazer:</b> clique em "Abrir este vídeo no YouTube", depois clique no ícone da extensão AnyDownload na barra do navegador → escolha MP3 → pronto.
-            <br><br>
-            <b>Ou (mais confiável):</b> instale o <code>yt-dlp</code> no seu PC e rode no terminal:
-            <code style="display:block;background:#000;padding:8px;border-radius:6px;margin-top:6px;font-size:.8rem">yt-dlp -x --audio-format mp3 "https://www.youtube.com/watch?v=${esc(videoId)}"</code>
-          </p>
-        </div>`);
-    }
-  } catch (e) {
-    toast('Erro: ' + ((e && e.message) || 'falha desconhecida'), 'err');
-    btn.disabled = false;
-    btn.innerHTML = orig;
+  // Se todas as camadas falharam, mostra o caminho manual
+  btn.disabled = false;
+  btn.innerHTML = orig;
+  const box = document.getElementById('ytbox');
+  if (box) {
+    box.insertAdjacentHTML('afterbegin', `
+      <div class="panel" style="margin-bottom:12px;border-color:var(--warn)">
+        <p class="note" style="margin:0">
+          <b>Não consegui baixar automaticamente este vídeo.</b> As 4 camadas (Piped, Invidious, Cobalt, API alternativa) falharam ou foram bloqueadas pelo YouTube para este vídeo específico. Isso é comum em clipes oficiais e conteúdo protegido.
+        </p>
+        <div class="tbar" style="margin-top:10px">
+          <a class="btn filled sm" href="https://www.youtube.com/watch?v=${esc(videoId)}" target="_blank" rel="noopener" style="text-decoration:none">
+            Abrir este vídeo no YouTube
+          </a>
+          <a class="btn ghost sm" href="https://addons.mozilla.org/pt-BR/firefox/addon/anydownload-media-downloader/" target="_blank" rel="noopener" style="text-decoration:none">
+            Instalar AnyDownload (Firefox)
+          </a>
+          <a class="btn ghost sm" href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener" style="text-decoration:none">
+            Ver yt-dlp no GitHub
+          </a>
+        </div>
+        <p class="hint" style="margin-top:10px;margin-bottom:0">
+          <b>Como resolver:</b> clique em "Abrir este vídeo no YouTube", depois clique no ícone da extensão AnyDownload na barra do navegador → escolha MP3 → pronto.
+          <br><br>
+          <b>Ou (mais confiável):</b> instale o <code>yt-dlp</code> no seu PC e rode no terminal:
+          <code style="display:block;background:#000;padding:8px;border-radius:6px;margin-top:6px;font-size:.8rem">yt-dlp -x --audio-format mp3 "https://www.youtube.com/watch?v=${esc(videoId)}"</code>
+        </p>
+      </div>`);
   }
 }
 
@@ -1836,23 +1844,21 @@ function ytEmbed(id) {
   const dlBtn = `<button class="btn filled" id="yt-download-btn" data-vid="${esc(id)}" style="display:inline-flex;align-items:center;gap:8px">${I.dl} Baixar MP3</button>`;
   const helpLink = `<a class="btn ghost" href="${esc(watch)}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px">${I.ext} Abrir no YouTube</a>`;
 
-  // Em file:// o iframe de embed é bloqueado (erro 153), mas o download via Piped/Invidious funciona.
   if (location.protocol === 'file:') {
     return `<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:12px">
       <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" style="width:200px;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#000" onerror="this.style.display='none'">
       <div style="flex:1;min-width:240px">
         <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">${helpLink}${dlBtn}</div>
-        <p class="hint">O player embutido não roda em <code>file://</code> (erro 153). O botão <b>Baixar MP3</b> tenta Piped/Invidious. Se falhar, use "Abrir no YouTube" + extensão AnyDownload.</p>
+        <p class="hint">O player embutido não roda em <code>file://</code> (erro 153). O botão <b>Baixar MP3</b> tenta automaticamente Piped → Invidious → Cobalt → API alternativa.</p>
       </div>
     </div>`;
   }
   const origin = encodeURIComponent(location.origin);
   return `<div class="ytframe"><iframe src="https://www.youtube.com/embed/${esc(id)}?autoplay=1&rel=0&playsinline=1&origin=${origin}" title="Player do YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
     <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">${helpLink}${dlBtn}</div>
-    <p class="hint" style="margin-top:8px">O download tenta APIs públicas (Piped/Invidious). Se todas falharem, o MusiTop te mostra o caminho manual com a extensão AnyDownload.</p>`;
+    <p class="hint" style="margin-top:8px">O download tenta <b>4 camadas</b> automaticamente (Piped → Invidious → Cobalt → API alternativa). Se todas falharem, o MusiTop te mostra o caminho manual.</p>`;
 }
 
-// Liga o clique do botão de download (criado dinamicamente pelo ytEmbed)
 function bindYtDownloadButton() {
   const box = document.getElementById('ytbox');
   if (!box || box.dataset.ytBound) return;
@@ -1870,7 +1876,7 @@ function ytId(u) {
   return /^[\w-]{11}$/.test(t) ? t : null;
 }
 function openYt() {
-  modal.innerHTML = `<div class="mhead"><div class="mi"><b>Ouvir e baixar do YouTube</b><span>player oficial + extração de áudio</span></div><button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>
+  modal.innerHTML = `<div class="mhead"><div class="mi"><b>Ouvir e baixar do YouTube</b><span>player oficial + 4 camadas de fallback automático</span></div><button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>
     <div class="mbody"><p class="note"><b>Sobre o YouTube:</b> baixar pode violar os termos deles — use com responsabilidade, apenas para conteúdo livre ou de sua autoria. O player embutido funciona no modo "Ouvir".</p>
     <form class="frm" id="ytform"><input id="yturl" placeholder="Cole o link do YouTube" spellcheck="false" autocomplete="off" aria-label="Link do YouTube"><button class="btn filled" type="submit">Ouvir</button></form><div id="ytbox"></div></div>`;
   openModal();
@@ -1885,7 +1891,6 @@ function openYt() {
 }
 $('#ytbtn').onclick = openYt;
 
-/* ---------- configurações ---------- */
 function openSettings() {
   modal.innerHTML = `<div class="mhead"><div class="mi"><b>Configurações</b><span>Ficam salvas neste navegador</span></div><button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>
     <div class="mbody">
@@ -1909,7 +1914,6 @@ function openSettings() {
 }
 $('#setbtn').onclick = openSettings;
 
-/* ---------- eventos da lista ---------- */
 view.addEventListener('error', e => {
   const el = e.target;
   if (el.tagName !== 'IMG') return;
@@ -1940,7 +1944,6 @@ p2pFileInput.onchange = () => {
   if (p2pFileInput.files && p2pFileInput.files[0]) { addP2P(p2pFileInput.files[0]); p2pFileInput.value = ''; }
 };
 
-/* ---------- busca (header) ---------- */
 let debT = null;
 function applyQuery(v) {
   state.q = v; state.genre = '';
@@ -1965,7 +1968,6 @@ qInput.addEventListener('keydown', e => {
 });
 qClear.onclick = () => { qInput.value = ''; qClear.hidden = true; state.q = ''; route(); qInput.focus(); };
 
-/* ---------- roteador ---------- */
 function route() {
   gen++;
   emptyBox.hidden = true;
