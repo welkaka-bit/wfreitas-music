@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>MusiTop — Baixe músicas grátis direto no navegador</title>
-<meta name="description" content="Busque, ouça e baixe músicas livres: Audius, Internet Archive, Openverse e álbuns via P2P. Cole links, acompanhe transferências e o log, tudo no navegador.">
+<meta name="description" content="Busque, ouça e baixe músicas livres: Jamendo, Audius, Internet Archive, Openverse e álbuns via P2P. Cole links, acompanhe transferências e o log, tudo no navegador.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2218%22%20fill%3D%22%2366d19e%22%2F%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2255%22%20r%3D%229%22%20fill%3D%22%23003920%22%2F%3E%3Ccircle%20cx%3D%2256%22%20cy%3D%2249%22%20r%3D%229%22%20fill%3D%22%23003920%22%2F%3E%3Crect%20x%3D%2235%22%20y%3D%2224%22%20width%3D%224%22%20height%3D%2231%22%20fill%3D%22%23003920%22%2F%3E%3Crect%20x%3D%2261%22%20y%3D%2218%22%20width%3D%224%22%20height%3D%2231%22%20fill%3D%22%23003920%22%2F%3E%3Cpath%20d%3D%22M35%2024l30-8v8l-30%208z%22%20fill%3D%22%23003920%22%2F%3E%3C%2Fsvg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -178,6 +178,19 @@ main{max-width:1380px;margin:0 auto;padding:6px clamp(12px,3vw,28px) 0}
 .p2phint{font-size:.84rem;color:var(--muted);line-height:1.7}
 .p2phint.err{color:var(--err)}
 .p2phint .chip{margin:6px 8px 0 0}
+.p2pglob{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:10px 16px;margin:14px 0;font-size:.8rem;color:var(--muted)}
+.p2pglob b{color:var(--text);font-weight:500;font-variant-numeric:tabular-nums}
+.p2pglob label{display:flex;gap:6px;align-items:center}
+.p2pglob input[type=number]{width:72px;background:transparent;border:1px solid var(--line2);border-radius:8px;color:var(--text);padding:4px 6px}
+.p2pst{font-size:.7rem;padding:2px 9px;border-radius:999px;border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
+.p2pst.dl{color:var(--p)}.p2pst.sd{color:var(--ok)}.p2pst.ps{color:var(--warn)}
+.p2pdet{margin-top:10px;display:flex;flex-direction:column;gap:10px}
+.p2ppcs{width:100%;height:14px;border-radius:4px;background:rgba(255,255,255,.06)}
+.p2pkv{display:flex;gap:16px;flex-wrap:wrap;font-size:.74rem;color:var(--muted2)}.p2pkv code{font-size:.7rem;word-break:break-all}
+.p2pbtns{display:flex;gap:8px;flex-wrap:wrap}
+.p2ppeers{display:grid;grid-template-columns:1fr auto auto;gap:3px 14px;font-size:.74rem;color:var(--muted2);font-variant-numeric:tabular-nums}
+.pfiles{max-height:340px;overflow:auto}.pfile input[type=checkbox]{accent-color:var(--p);flex:0 0 auto}
+.pfile .pfp{font-size:.72rem;color:var(--muted2);min-width:36px;text-align:right}
 details.adv{border:1px dashed var(--line2);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:12px}
 details.adv summary{cursor:pointer;font-size:.86rem;font-weight:500;color:var(--muted)}
 details.adv summary:hover{color:var(--text)}
@@ -367,7 +380,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
 /* ================================================================
    MusiTop v2 — baixador de músicas 100% no navegador
    UX: Soulseek (resultados em tabela + transferências), yt-dlp (link + log),
-       Seal (Material You + fila). Fontes: Audius, Internet Archive, Openverse, P2P.
+       Seal (Material You + fila). Fontes: Jamendo, Audius, Internet Archive, Openverse, P2P.
    ================================================================ */
 
 /* ---------- utils ---------- */
@@ -431,7 +444,7 @@ const qInput = $('#q'), qClear = $('#qclear');
 /* ---------- storage / config ---------- */
 const lsGet = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
-const cfg = Object.assign({ tpl:'artist-title', conc:2, layout:'list' }, lsGet('mt_cfg', {}));
+const cfg = Object.assign({ tpl:'artist-title', conc:2, layout:'list', jamId:'' }, lsGet('mt_cfg', {}));
 state.layout = cfg.layout === 'grid' ? 'grid' : 'list';
 const saveCfg = () => lsSet('mt_cfg', cfg);
 const getFavs = () => lsGet('mt_favs', []);
@@ -533,7 +546,7 @@ function fileName(t) {
 
 /* ---------- navegação / filtros ---------- */
 const TAGS = ['', 'Pagode', 'Samba', 'Rap', 'Funk', 'Sertanejo', 'Forró', 'MPB', 'Bossa Nova', 'Axé', 'Choro', 'Gospel', 'Rock', 'Pop', 'Eletrônica', 'Hip-Hop', 'Lo-Fi', 'Jazz', 'Reggae', 'Metal', 'Soul', 'Clássica'];
-const SRCS = [['all','Todas'],['audius','Audius'],['ia','Acervo'],['ov','Openverse']];
+const SRCS = [['all','Todas'],['jam','Jamendo'],['audius','Audius'],['ia','Acervo'],['ov','Openverse']];
 const ERAS = {
   '':       { label: 'Todas as épocas',    range: '' },
   'antiga': { label: 'Antigas (até 1979)', range: '[1000 TO 1979]' },
@@ -582,7 +595,7 @@ function paintLayoutBtn() {
 }
 
 /* ---------- render: lista / grade ---------- */
-const srcLab = t => ({ audius:['Audius',''], pl:['Audius',''], ov:['Openverse','cc'], ia:['Acervo','alt'], iaitem:['Acervo','alt'], p2pitem:['P2P','p2p'], url:['Link','alt'] }[t.src] || ['Fonte','']);
+const srcLab = t => ({ jam:['Jamendo','cc'], audius:['Audius',''], pl:['Audius',''], ov:['Openverse','cc'], ia:['Acervo','alt'], iaitem:['Acervo','alt'], p2pitem:['P2P','p2p'], url:['Link','alt'] }[t.src] || ['Fonte','']);
 function rowHtml(t, D) {
   const alb = isAlbum(t), [lab, cls] = srcLab(t), fav = !alb && isFav(t.id), dled = D.has(t.id);
   const info = alb ? (t.src === 'pl' ? (t.total ? t.total + ' faixas' : 'coletânea') : (t.year ? String(t.year) : 'álbum')) : (t.license || (t.plays ? fmtN(t.plays) + ' plays' : ''));
@@ -660,20 +673,25 @@ async function loadTrending() {
 }
 async function searchAll(q) {
   const g = setLoading(), f = state.srcf;
+  if (f === 'jam' && !cfg.jamId) { if (g === gen) { state.tracks = []; jamNeedsId(); } return; }
+  const pJ = ((f === 'all' && cfg.jamId) || f === 'jam') ? (async () => { try { return await jamFetch(q, false); } catch { return []; } })() : Promise.resolve([]);
   const pA = (f === 'all' || f === 'audius') ? (async () => {
     try { const j = await api('/v1/tracks/search?query=' + encodeURIComponent(q) + '&limit=40', 16000); return (j.data || []).map(normA).filter(Boolean).filter(t => t.streamable); } catch { return []; }
   })() : Promise.resolve([]);
   const pI = (f === 'all' || f === 'ia') ? (async () => { try { return (await iaSearchDocs(iaQuery(q))).map(iaItem); } catch { return []; } })() : Promise.resolve([]);
   const pO = (f === 'all' || f === 'ov') ? (async () => { try { return await ovSearch(q); } catch { return []; } })() : Promise.resolve([]);
-  const [a, i, o] = await Promise.all([pA, pI, pO]);
+  const [j, a, i, o] = await Promise.all([pJ, pA, pI, pO]);
   if (g !== gen) return;
-  setTracks([...a, ...i, ...o]);
+  const all = unify([j, a, o, i]);
+  setTracks(all);
   const bits = [];
-  if (a.length) bits.push(a.length + ' faixas no Audius');
+  if (j.length) bits.push(j.length + ' no Jamendo');
+  if (a.length) bits.push(a.length + ' no Audius');
   if (i.length) bits.push(i.length + ' álbuns no Acervo');
-  if (o.length) bits.push(o.length + ' faixas CC no Openverse');
-  $('#sec-sub').textContent = bits.join(' · ') || 'Nada encontrado — tente outro termo' + (state.era ? ' ou mude a época' : '');
-  if (!a.length && !i.length && !o.length) paintEmpty('error', 'Nada para “' + q + '” nas fontes selecionadas. Tente outro termo, outra fonte ou verifique a conexão.');
+  if (o.length) bits.push(o.length + ' CC no Openverse');
+  const dups = j.length + a.length + i.length + o.length - all.length;
+  $('#sec-sub').textContent = (bits.join(' · ') || 'Nada encontrado — tente outro termo' + (state.era ? ' ou mude a época' : '')) + (dups > 0 ? ' · ' + dups + ' duplicada' + (dups > 1 ? 's' : '') + ' removida' + (dups > 1 ? 's' : '') : '');
+  if (!all.length) paintEmpty('error', 'Nada para “' + q + '” nas fontes selecionadas. Tente outro termo, outra fonte ou verifique a conexão.');
 }
 
 /* ---------- Internet Archive ---------- */
@@ -746,6 +764,71 @@ async function loadAlbums() {
     $('#sec-sub').textContent = pls.length + ' coletâneas no Audius · ' + ias.length + ' álbuns livres no Internet Archive';
     if (!pls.length && !ias.length) paintEmpty('error', 'Nenhum álbum encontrado agora — tente novamente em instantes.');
   } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Falha ao carregar álbuns: ' + (e && e.message)); }
+}
+
+/* ---------- Jamendo (Creative Commons, download liberado pelos artistas) ---------- */
+const JAM_TAGS = { 'Eletrônica':'electronic', 'Rock':'rock', 'Pop':'pop', 'Jazz':'jazz', 'Hip-Hop':'hiphop', 'Rap':'hiphop', 'Reggae':'reggae', 'Metal':'metal', 'Soul':'soul', 'Clássica':'classical', 'Lo-Fi':'lofi', 'Bossa Nova':'bossanova', 'Funk':'funk' };
+const jamCache = new Map();
+function jamLicense(u) {
+  const m = String(u || '').match(/licenses\/([a-z-]+)\//i);
+  return m ? 'CC ' + m[1].toUpperCase() : 'CC';
+}
+function normJam(r) {
+  if (!r || !r.id || !r.audio) return null;
+  if (r.audiodownload_allowed === false) return null;     // só entra o que o artista liberou para baixar
+  return {
+    id: 'j:' + r.id, src: 'jam', rid: r.id,
+    title: r.name || 'Sem título', artist: r.artist_name || 'Desconhecido',
+    duration: +r.duration || 0, art: r.image || '', plays: 0, streamable: true,
+    license: jamLicense(r.license_ccurl),
+    url: r.audio,                                          // streaming
+    dl: r.audiodownload || r.audio,                        // arquivo para baixar
+    name: 'x.mp3', permalink: r.shareurl || null
+  };
+}
+async function jamFetch(term, popular) {
+  if (!cfg.jamId) return [];
+  const key = (popular ? '~' : '') + String(term || '').toLowerCase().trim();
+  if (jamCache.has(key)) return jamCache.get(key);
+  const tag = JAM_TAGS[term];
+  let u = 'https://api.jamendo.com/v3.0/tracks/?format=json&limit=40&include=licenses&audioformat=mp32&audiodlformat=mp32&client_id=' + encodeURIComponent(cfg.jamId);
+  if (term) u += tag ? '&tags=' + tag + '&order=popularity_month' : '&search=' + encodeURIComponent(term);
+  else u += '&order=popularity_week';
+  const r = await fetchT(u, 15000);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const j = await r.json();
+  if (j.headers && j.headers.status === 'failed') throw new Error(j.headers.error_message || 'client_id inválido');
+  const list = (j.results || []).map(normJam).filter(Boolean);
+  jamCache.set(key, list);
+  return list;
+}
+function jamNeedsId() {
+  view.innerHTML = '<div class="panel"><p class="note"><b>Jamendo:</b> falta o <b>client_id</b> (grátis em developer.jamendo.com). Cole em Configurações para liberar milhões de faixas Creative Commons com download.</p><div class="tbar" style="margin-top:12px"><button class="btn filled sm" id="jam-cfg">Abrir configurações</button></div></div>';
+  $('#jam-cfg').onclick = openSettings;
+}
+async function loadJam() {
+  const g = setLoading();
+  if (!cfg.jamId) { if (g === gen) { state.tracks = []; jamNeedsId(); } return; }
+  try {
+    const list = await jamFetch('', true);
+    if (g !== gen) return;
+    setTracks(list);
+    $('#sec-sub').textContent = list.length + ' faixas Creative Commons em alta no Jamendo — download liberado pelos artistas';
+  } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Jamendo indisponível (' + (e && e.message) + '). Confira o client_id nas Configurações.'); }
+}
+
+/* ---------- busca unificada: dedupe + intercalação ---------- */
+const dupKey = t => (String(t.artist || '') + '|' + String(t.title || '')).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+function unify(groups) {            // groups em ordem de prioridade (Jamendo, Audius, Openverse...); álbuns vão para o fim
+  const seen = new Set(), tracks = [], albums = [];
+  const lists = groups.map(g => g.filter(t => { if (isAlbum(t)) { albums.push(t); return false; } return true; }));
+  const max = Math.max(0, ...lists.map(l => l.length));
+  for (let i = 0; i < max; i++) for (const l of lists) {
+    const t = l[i]; if (!t) continue;
+    const k = dupKey(t); if (k && seen.has(k)) continue;
+    seen.add(k); tracks.push(t);
+  }
+  return [...tracks, ...albums];
 }
 
 /* ---------- Openverse ---------- */
@@ -996,7 +1079,7 @@ function progLine(d) {
 }
 async function runDl(d) {
   d.status = 'baixando'; d.ctl = new AbortController();
-  const t0 = performance.now(), name = fileName(d.t), url = streamUrl(d.t), key = 'p' + d.id;
+  const t0 = performance.now(), name = fileName(d.t), url = d.t.dl || streamUrl(d.t), key = 'p' + d.id;
   logLine('[info] ' + d.id + ': Downloading 1 format(s): original', 'i');
   logLine('[download] Destination: ' + name, 'd');
   paintXfers();
@@ -1245,7 +1328,7 @@ function loadWebTorrent() {
   return wtLoading;
 }
 function p2pClient() {
-  if (!wtClient) { wtClient = new window.WebTorrent(); wtClient.on('error', e => console.warn('[p2p]', e && e.message)); }
+  if (!wtClient) { wtClient = new window.WebTorrent({ maxConns: 80 }); wtClient.on('error', e => console.warn('[p2p]', e && e.message)); applyLimits(); }
   return wtClient;
 }
 function addViaClient(client, src, ms = 60000) {
@@ -1253,7 +1336,7 @@ function addViaClient(client, src, ms = 60000) {
     let done = false, t;
     const fin = (f, v) => { if (done) return; done = true; clearTimeout(tm); f(v); };
     const tm = setTimeout(() => { try { if (t) client.remove(t); } catch {} fin(rej, new Error('tempo esgotado esperando o torrent (sem peers/webseed)')); }, ms);
-    try { t = client.add(src, tor => fin(res, tor)); } catch (e) { fin(rej, e); return; }
+    try { t = client.add(src, { announce: WSS_TRACKERS }, tor => fin(res, tor)); } catch (e) { fin(rej, e); return; }
     t.on('error', e => fin(rej, e));
   });
 }
@@ -1299,31 +1382,173 @@ async function addP2P(raw) {
     logLine('ERROR: p2p: ' + ((e && e.message) || 'erro'), 'e');
   } finally { p2pBusy = false; }
 }
-function registerP2PTorrent(torrent, say) {
+/* ---------- P2P v2: cliente completo (pausa, limites, peers, peças, seleção de arquivos, semear, sessão) ---------- */
+const WSS_TRACKERS = ['wss://tracker.openwebtorrent.com', 'wss://tracker.webtorrent.dev', 'wss://tracker.btorrent.xyz', 'wss://tracker.files.fm:7073/announce'];
+const P2P_KEY = 'musitop.p2p.v1', P2P_LIM = 'musitop.p2p.lim', AUD_RE = /\.(mp3|m4a|ogg|opus|wav|flac)$/i;
+let p2pRestoring = false;
+const b64 = u8 => { let s = ''; for (let i = 0; i < u8.length; i += 0x8000) s += String.fromCharCode.apply(null, u8.subarray(i, i + 0x8000)); return btoa(s); };
+const unb64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const itOfTorrent = t => [...p2pItems.values()].find(i => i.torrent === t);
+function p2pSave() {
+  if (p2pRestoring) return;
+  try {
+    const arr = [];
+    for (const it of p2pItems.values()) {
+      if (it.seeded) continue;                      // arquivos semeados do disco não podem ser restaurados
+      const t = it.torrent, tf = t.torrentFile, e = { paused: !!it.paused, off: [...it.off] };
+      if (tf && tf.length < 400000) e.tf = b64(tf); else if (t.magnetURI) e.mg = t.magnetURI; else continue;
+      arr.push(e);
+    }
+    localStorage.setItem(P2P_KEY, JSON.stringify(arr.slice(-30)));
+  } catch {}
+}
+async function p2pRestore() {
+  let arr; try { arr = JSON.parse(localStorage.getItem(P2P_KEY) || '[]'); } catch { return; }
+  if (!arr.length) return;
+  p2pRestoring = true;
+  try {
+    await loadWebTorrent(); p2pClient();
+    let n = 0;
+    for (const e of arr) {
+      try {
+        const it = registerP2PTorrent(await addViaClient(p2pClient(), e.tf ? unb64(e.tf) : e.mg, 30000), null, { quiet: true });
+        if (it) { (e.off || []).forEach(i => it.off.add(i)); p2pPause(it); n++; }
+      } catch {}
+    }
+    if (n) { toast(n + ' torrent(s) restaurado(s) — pausados; retome para baixar de novo', 'ok'); logLine('[info] p2p: sessão restaurada (' + n + ')', 'i'); }
+  } catch {} finally { p2pRestoring = false; p2pSave(); refreshP2PList(); }
+}
+function applyLimits() {
+  const c = wtClient; if (!c) return;
+  let l = { d: 0, u: 0 }; try { l = JSON.parse(localStorage.getItem(P2P_LIM) || '') || l; } catch {}
+  try { c.throttleDownload(l.d > 0 ? l.d * 1024 : -1); c.throttleUpload(l.u > 0 ? l.u * 1024 : -1); } catch {}
+}
+function p2pApplySel(it) { (it.torrent.files || []).forEach((f, i) => { try { it.off.has(i) ? f.deselect() : f.select(); } catch {} }); }
+function p2pPause(it) { it.paused = true; try { it.torrent.pause(); } catch {} try { it.torrent.deselect(0, it.torrent.pieces.length - 1, 0); } catch {} p2pSave(); }
+function p2pResume(it) { it.paused = false; try { it.torrent.resume(); } catch {} p2pApplySel(it); p2pSave(); }
+function p2pToggleFile(it, idx) { it.off.has(idx) ? it.off.delete(idx) : it.off.add(idx); if (!it.paused) p2pApplySel(it); p2pSave(); }
+function p2pAudioOnly(it) { it.off.clear(); (it.torrent.files || []).forEach((f, i) => { if (!AUD_RE.test(f.name)) it.off.add(i); }); if (!it.paused) p2pApplySel(it); p2pSave(); }
+function p2pStats(it) {
+  const t = it.torrent, fs = t.files || []; let tot = 0, got = 0;
+  fs.forEach((f, i) => { if (!it.off.has(i)) { tot += f.length; got += f.downloaded || 0; } });
+  const pct = !fs.length ? 0 : tot ? Math.min(1, got / tot) : 1, dl = t.downloadSpeed || 0, left = tot - got;
+  const wires = t.wires || [], ws = wires.filter(w => w.type === 'webSeed').length, peers = wires.length - ws;
+  let st = 'Conectando...', cls = '';
+  if (it.paused) { st = 'Pausado'; cls = 'ps'; }
+  else if (!t.ready) st = 'Metadados...';
+  else if (pct >= 1) { st = it.seeded || t.numPeers ? 'Semeando' : 'Concluído'; cls = 'sd'; }
+  else if (dl > 0) { st = 'Baixando'; cls = 'dl'; }
+  return { pct, dl, ul: t.uploadSpeed || 0, eta: dl > 0 && left > 0 ? left / dl : Infinity, st, cls, peers, ws, ratio: t.downloaded ? (t.uploaded / t.downloaded).toFixed(2) : '—' };
+}
+function p2pMetaHtml(it) {
+  const s = p2pStats(it), t = it.torrent, ab = it.files.reduce((a, f) => a + (f.size || 0), 0);
+  return `<span>${Math.round(s.pct * 100)}%</span><span>↓ ${fmtSp(s.dl)}</span><span>↑ ${fmtSp(s.ul)}</span><span>ETA ${fmtETA(s.eta)}</span><span>${s.peers} peers${s.ws ? ' + ' + s.ws + ' webseed' : ''}</span><span>${fmtMB(t.downloaded)} ↓ · ${fmtMB(t.uploaded)} ↑</span><span>razão ${s.ratio}</span><span>${it.files.length} faixa(s) · ${fmtMB(ab)} · total ${fmtMB(t.length)}</span>`;
+}
+function p2pPeersHtml(t) {
+  const w = (t.wires || []).slice().sort((a, b) => b.downloadSpeed() - a.downloadSpeed()).slice(0, 12);
+  return w.length ? w.map(x => `<span>${x.type === 'webSeed' ? 'Webseed' : 'WebRTC'} · ${esc(x.remoteAddress || (x.peerId ? String(x.peerId).slice(0, 10) : '—'))}</span><span>↓ ${fmtSp(x.downloadSpeed())}</span><span>↑ ${fmtSp(x.uploadSpeed())}</span>`).join('') : '<span>Nenhum peer conectado</span>';
+}
+let p2pAccent = '';
+function p2pDrawPieces(cv, t) {
+  try {
+    const n = (t.pieces || []).length; if (!n || !t.bitfield) return;
+    if (!p2pAccent) p2pAccent = getComputedStyle(document.documentElement).getPropertyValue('--p').trim() || '#9be28b';
+    const W = cv.width = cv.clientWidth || 300, H = cv.height = 14, cols = Math.min(n, Math.floor(W / 3)), ctx = cv.getContext('2d');
+    ctx.clearRect(0, 0, W, H); ctx.fillStyle = p2pAccent;
+    for (let c = 0; c < cols; c++) {
+      const a = Math.floor(c * n / cols), b = Math.max(a + 1, Math.floor((c + 1) * n / cols)), step = Math.max(1, Math.floor((b - a) / 8));
+      let have = 0, tot = 0; for (let i = a; i < b; i += step) { tot++; if (t.bitfield.get(i)) have++; }
+      ctx.globalAlpha = tot ? 0.12 + 0.88 * have / tot : 0.12; ctx.fillRect(c * (W / cols), 0, Math.max(1, W / cols - 1), H);
+    }
+    ctx.globalAlpha = 1;
+  } catch {}
+}
+function p2pPaintRow(it, row) {
+  const s = p2pStats(it), bar = row.querySelector('.bar i'), m = row.querySelector('.p2pmeta'), st = row.querySelector('.p2pst');
+  if (bar) bar.style.width = Math.round(s.pct * 100) + '%';
+  if (m) m.innerHTML = p2pMetaHtml(it);
+  if (st) { st.textContent = s.st; st.className = 'p2pst ' + s.cls; }
+  if (!it.open) return;
+  const pe = row.querySelector('.p2ppeers'); if (pe) pe.innerHTML = p2pPeersHtml(it.torrent);
+  const cv = row.querySelector('.p2ppcs'); if (cv) p2pDrawPieces(cv, it.torrent);
+  row.querySelectorAll('.pfile[data-pfid]').forEach(r => { const pf = p2pFiles.get(r.dataset.pfid), p = r.querySelector('.pfp'); if (pf && p) p.textContent = Math.round((pf.file.progress || 0) * 100) + '%'; });
+}
+function p2pCard(it) {
+  const t = it.torrent, s = p2pStats(it);
+  const fileRow = pf => `<div class="pfile" data-pfid="${esc(pf.id)}"><input type="checkbox" data-pchk="${esc(pf.id)}" ${it.off.has(pf.idx) ? '' : 'checked'} aria-label="Baixar ${esc(pf.name)}">
+      <button class="ib sm" data-playp="${esc(pf.id)}" title="Ouvir" aria-label="Ouvir ${esc(pf.name)}">${I.play}</button>
+      <b title="${esc(pf.name)}">${esc(pf.name.replace(/^.*\//, ''))}</b><span class="pfp">${Math.round((pf.file.progress || 0) * 100)}%</span><span class="pfs">${fmtMB(pf.size)}</span>
+      <button class="ib sm dlb" data-dlp="${esc(pf.id)}" title="Baixar para o disco" aria-label="Baixar ${esc(pf.name)}">${I.dl}</button></div>`;
+  const det = it.open ? `<div class="p2pdet"><canvas class="p2ppcs" aria-label="Mapa de peças"></canvas>
+      <div class="p2pkv"><span>Hash <code>${esc(t.infoHash || '—')}</code></span><span>${(t.announce || []).length} trackers</span><span>${(t.pieces || []).length} peças</span></div>
+      <div class="p2pbtns"><button class="btn ghost sm" data-paud="${it.id}">Só áudio</button><button class="btn ghost sm" data-pall="${it.id}">Todos os arquivos</button></div>
+      <div class="p2ppeers">${p2pPeersHtml(t)}</div></div>` : '';
+  return `<div class="p2ptor" data-tid="${it.id}">
+    <div class="p2phead"><b title="${esc(it.name)}">${esc(it.name)}</b><span class="p2pst ${s.cls}">${s.st}</span>
+      <button class="btn ghost sm" data-ppause="${it.id}">${it.paused ? 'Retomar' : 'Pausar'}</button>
+      <button class="btn ghost sm" data-ptog="${it.id}">${it.open ? 'Menos' : 'Detalhes'}</button>
+      <button class="btn ghost sm" onclick="copyMagnetLive('${esc(it.id)}')" title="Copiar magnet deste torrent">Magnet</button>
+      <button class="ib sm" data-rm="${it.id}" title="Remover" aria-label="Remover torrent">${I.x}</button></div>
+    <div class="bar"><i style="width:${Math.round(s.pct * 100)}%"></i></div>
+    <div class="p2pmeta">${p2pMetaHtml(it)}</div>${det}
+    ${it.files.length ? `<div class="pfiles">${it.files.map(fileRow).join('')}</div>` : '<p class="pmore">Nenhum arquivo de áudio neste torrent.</p>'}
+  </div>`;
+}
+function p2pClick(e) {
+  const g = a => e.target.closest('[' + a + ']'); let x, it;
+  if ((x = g('data-ptog'))) { if ((it = p2pItems.get(x.dataset.ptog))) { it.open = !it.open; refreshP2PList(); } return true; }
+  if ((x = g('data-ppause'))) { if ((it = p2pItems.get(x.dataset.ppause))) { it.paused ? p2pResume(it) : p2pPause(it); refreshP2PList(); } return true; }
+  if ((x = g('data-paud'))) { if ((it = p2pItems.get(x.dataset.paud))) { p2pAudioOnly(it); refreshP2PList(); } return true; }
+  if ((x = g('data-pall'))) { if ((it = p2pItems.get(x.dataset.pall))) { it.off.clear(); if (!it.paused) p2pApplySel(it); p2pSave(); refreshP2PList(); } return true; }
+  if ((x = g('data-pchk'))) { const pf = p2pFiles.get(x.dataset.pchk); if (pf && (it = itOfTorrent(pf.torrent))) p2pToggleFile(it, pf.idx); return true; }
+  return false;
+}
+function p2pGlobHtml() {
+  let l = { d: 0, u: 0 }; try { l = JSON.parse(localStorage.getItem(P2P_LIM) || '') || l; } catch {}
+  return `<span>↓ <b id="gdl">—</b></span><span>↑ <b id="gul">—</b></span><span>Torrents <b id="gtn">0</b></span><span>Peers <b id="gpe">0</b></span><span>Razão <b id="grt">—</b></span>
+    <label>Limite ↓ <input type="number" min="0" id="glimd" value="${l.d || ''}" placeholder="∞"> KiB/s</label><label>↑ <input type="number" min="0" id="glimu" value="${l.u || ''}" placeholder="∞"> KiB/s</label>
+    <button class="btn tonal sm" type="button" id="p2pseedbtn">Semear arquivos</button><input type="file" id="p2pseedin" multiple accept="audio/*" hidden>`;
+}
+function p2pBindGlob() {
+  const sv = () => { try { localStorage.setItem(P2P_LIM, JSON.stringify({ d: +$('#glimd').value || 0, u: +$('#glimu').value || 0 })); } catch {} applyLimits(); };
+  $('#glimd').onchange = sv; $('#glimu').onchange = sv;
+  $('#p2pseedbtn').onclick = () => $('#p2pseedin').click();
+  $('#p2pseedin').onchange = e => { const fl = [...e.target.files]; e.target.value = ''; p2pSeed(fl).catch(err => toast('Erro ao semear: ' + ((err && err.message) || 'falha'), 'err')); };
+}
+async function p2pSeed(files) {
+  if (!files.length) return;
+  await loadWebTorrent();
+  const tor = await new Promise((res, rej) => { try { p2pClient().seed(files.length > 1 ? files : files[0], { announce: WSS_TRACKERS, name: files.length > 1 ? 'Semente ' + new Date().toLocaleDateString('pt-BR') : files[0].name }, res); } catch (e) { rej(e); } });
+  const it = registerP2PTorrent(tor, null, { seeded: true });
+  if (it) copyText(tor.magnetURI, 'Semeando! Magnet copiado — mantenha a aba aberta');
+}
+function registerP2PTorrent(torrent, say, opts = {}) {
   const id = 't' + (torrent.infoHash || Date.now().toString(36));
-  if (p2pItems.has(id)) { if (say) say('Este torrent já está na lista.'); return; }
-  const it = { id, torrent, files: [], name: torrent.name || 'Torrent' };
+  if (p2pItems.has(id)) { if (say) say('Este torrent já está na lista.'); return null; }
+  const it = { id, torrent, files: [], name: torrent.name || 'Torrent', off: new Set(), paused: false, open: false, seeded: !!opts.seeded };
   p2pItems.set(id, it);
   harvestP2PFiles(it);
   if (say) say('');
-  logLine('[info] p2p: torrent adicionado — ' + it.name, 'i');
-  toast('Torrent adicionado: ' + it.name, 'ok');
-  torrent.on('done', () => { toast('Download P2P concluído: ' + it.name, 'ok'); logLine('[info] p2p: concluído — ' + it.name, 'd'); });
-  refreshP2PList();
+  if (!opts.quiet) { logLine('[info] p2p: torrent adicionado — ' + it.name, 'i'); toast('Torrent adicionado: ' + it.name, 'ok'); }
+  torrent.on('done', () => { if (!it.paused) { toast('Download P2P concluído: ' + it.name, 'ok'); logLine('[info] p2p: concluído — ' + it.name, 'd'); } });
+  torrent.on('warning', w => logLine('[warn] p2p: ' + ((w && w.message) || w), 'w'));
+  refreshP2PList(); p2pSave();
+  return it;
 }
 function harvestP2PFiles(it) {
   for (const pf of it.files) p2pFiles.delete(pf.id);
-  it.files = (it.torrent.files || []).filter(f => /\.(mp3|m4a|ogg|opus|wav|flac)$/i.test(f.name)).slice(0, 60).map((f, i) => {
-    const pf = { id: it.id + ':' + i, torrent: it.torrent, file: f, name: f.name, size: f.length };
-    p2pFiles.set(pf.id, pf);
-    return pf;
+  it.files = [];
+  (it.torrent.files || []).forEach((f, idx) => {
+    if (!AUD_RE.test(f.name) || it.files.length >= 60) return;
+    const pf = { id: it.id + ':' + it.files.length, torrent: it.torrent, file: f, name: f.name, size: f.length, idx };
+    p2pFiles.set(pf.id, pf); it.files.push(pf);
   });
 }
 function removeP2P(id) {
   const it = p2pItems.get(id); if (!it) return;
   try { if (wtClient) wtClient.remove(it.torrent); } catch {}
   for (const pf of it.files) p2pFiles.delete(pf.id);
-  p2pItems.delete(id);
+  p2pItems.delete(id); p2pSave();
   refreshP2PList(); paintXfers();
 }
 function npFromP2P(pf) {
@@ -1335,6 +1560,7 @@ function npFromP2P(pf) {
 const webseedBase = (pf, httpsOnly) => (pf.torrent.urlList || []).map(u => String(u).replace(/^http:/i, 'https:')).find(u => /^https:/i.test(u) || (!httpsOnly && /^http:/i.test(u)));
 async function playP2P(pf) {
   const g = ++playGen;
+  { const it = itOfTorrent(pf.torrent); if (it && it.off.has(pf.idx)) { it.off.delete(pf.idx); if (!it.paused) p2pApplySel(it); p2pSave(); } }
   try {
     const base = webseedBase(pf, true);
     if (base) {
@@ -1373,20 +1599,6 @@ async function dlP2P(pf) {
     toast('Download P2P iniciado: ' + pf.name, 'ok');
   } catch (e) { toast('Erro no download P2P: ' + ((e && e.message) || 'erro'), 'err'); }
 }
-function p2pCard(it) {
-  const t = it.torrent, pct = Math.round((t.progress || 0) * 100), shown = it.files.slice(0, 30);
-  const audBytes = it.files.reduce((a, f) => a + (f.size || 0), 0);
-  const mixed = audBytes > 0 && audBytes < t.length * 0.25;
-  return `<div class="p2ptor" data-tid="${it.id}">
-    <div class="p2phead"><b title="${esc(it.name)}">${esc(it.name)}</b><button class="ib sm" data-rm="${it.id}" title="Remover" aria-label="Remover torrent">${I.x}</button></div>
-    <div class="bar"><i style="width:${pct}%"></i></div>
-    <div class="p2pmeta"><span>${pct}%</span><span>${t.numPeers || 0} peers</span><span>${fmtMB(t.downloaded || 0)} baixados</span><span>${it.files.length} faixa(s) · ${fmtMB(audBytes)}</span>${mixed ? `<span>torrent total ${fmtMB(t.length)}</span>` : ''}</div>
-    ${shown.length ? `<div class="pfiles">${shown.map(pf => `<div class="pfile">
-        <button class="ib sm" data-playp="${esc(pf.id)}" title="Ouvir" aria-label="Ouvir ${esc(pf.name)}">${I.play}</button>
-        <b title="${esc(pf.name)}">${esc(pf.name.replace(/^.*\//, ''))}</b><span class="pfs">${fmtMB(pf.size)}</span>
-        <button class="ib sm dlb" data-dlp="${esc(pf.id)}" title="Baixar" aria-label="Baixar ${esc(pf.name)}">${I.dl}</button></div>`).join('')}</div>${it.files.length > 30 ? `<p class="pmore">+ ${it.files.length - 30} arquivos de áudio (use “Baixar faixas direto” no modal do álbum).</p>` : ''}` : '<p class="pmore">Nenhum arquivo de áudio neste torrent.</p>'}
-  </div>`;
-}
 const P2P_TAGS = ['Populares', 'Pagode', 'Samba', 'Rap', 'Funk', 'Sertanejo', 'MPB', 'Forró', 'Gospel', 'Jazz', 'Lo-Fi', 'Blues', 'Rock', 'Eletrônica'];
 function renderP2P(q) {
   head('P2P — álbuns completos', 'Busque um grupo, música ou álbum: baixo o disco inteiro via torrent com webseed do Archive', false);
@@ -1401,6 +1613,7 @@ function renderP2P(q) {
         <form class="frm" id="p2pform"><input id="p2pin" placeholder="magnet:?xt=... · https://.../album.torrent · identificador-do-archive.org" spellcheck="false" autocomplete="off" aria-label="Magnet, torrent ou identificador"><button class="btn tonal" type="submit">${I.dl} Adicionar</button></form>
         <button class="btn ghost" id="p2pfilebtn" type="button">${I.folder} Selecionar arquivo .torrent (ou arraste aqui)</button>
       </details></div>
+    <div class="p2pglob" id="p2pglob">${p2pGlobHtml()}</div>
     <h4 class="sub-h" id="p2preshd" hidden></h4><div id="p2presults"></div>
     <h4 class="sub-h" id="p2ptorshd" ${p2ps.length ? '' : 'hidden'}>Seus torrents (${p2ps.length})</h4>
     <div id="p2plist">${p2ps.map(p2pCard).join('')}</div>`;
@@ -1418,6 +1631,7 @@ function renderP2P(q) {
   };
   $('#p2pform').onsubmit = e => { e.preventDefault(); const v = $('#p2pin').value.trim(); if (v) { $('#p2pin').value = ''; addP2P(v); } };
   $('#p2pfilebtn').onclick = () => $('#p2pfile').click();
+  p2pBindGlob();
   const panel = view.querySelector('.panel');
   panel.addEventListener('dragover', e => e.preventDefault());
   panel.addEventListener('drop', e => { e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f && /\.torrent$/i.test(f.name)) addP2P(f); });
@@ -1553,9 +1767,58 @@ function iaTorrentSteps(item, say) {
   say('<b>Plano B</b> — <b>1)</b> <a class="chip" href="' + esc(torUrl) + '" target="_blank" rel="noopener">baixe o .torrent aqui</a> <b>2)</b> <button class="chip" type="button" id="p2ppick2">selecione o arquivo</button><br><span class="pmore">Depois disso o WebTorrent baixa o álbum inteiro via webseed do Archive.</span>', true);
   const pk = $('#p2ppick2'); if (pk) pk.onclick = () => $('#p2pfile').click();
 }
+/* ---------- links .torrent / magnet (acervo aberto do Internet Archive) ---------- */
+const torUrlOf = id => IA + '/download/' + encodeURIComponent(id) + '/' + encodeURIComponent(id + '_archive.torrent');
+async function copyText(txt, okMsg) {
+  try { await navigator.clipboard.writeText(txt); toast(okMsg || 'Copiado!', 'ok'); return; } catch {}
+  try {
+    const ta = document.createElement('textarea'); ta.value = txt; ta.style.cssText = 'position:fixed;opacity:0';
+    document.body.appendChild(ta); ta.select(); const ok = document.execCommand('copy'); ta.remove();
+    if (ok) { toast(okMsg || 'Copiado!', 'ok'); return; }
+  } catch {}
+  window.prompt('Copie o link (Ctrl+C):', txt);
+}
+function infoDictBytes(buf) {            // leitor mínimo de bencode: devolve os bytes crus do dicionário "info"
+  const b = new Uint8Array(buf); let i = 1;
+  const num = () => { let n = 0; while (b[i] !== 0x3a) { n = n * 10 + (b[i] - 48); i++; } i++; return n; };
+  const skip = () => {
+    const c = b[i];
+    if (c === 0x69) { while (b[i] !== 0x65) i++; i++; }
+    else if (c === 0x6c || c === 0x64) { i++; while (b[i] !== 0x65) skip(); i++; }
+    else { const n = num(); i += n; }
+  };
+  while (b[i] !== 0x65) {
+    const n = num(), key = new TextDecoder().decode(b.slice(i, i + n)); i += n;
+    if (key === 'info') { const st = i; skip(); return b.slice(st, i); }
+    skip();
+  }
+  return null;
+}
+async function magnetFromTorrent(buf, name, id) {
+  const info = infoDictBytes(buf); if (!info) throw new Error('torrent inválido');
+  const h = [...new Uint8Array(await crypto.subtle.digest('SHA-1', info))].map(x => x.toString(16).padStart(2, '0')).join('');
+  return 'magnet:?xt=urn:btih:' + h + '&dn=' + encodeURIComponent(name || id) +
+    '&tr=' + encodeURIComponent('udp://tracker.opentrackr.org:1337/announce') +
+    '&tr=' + encodeURIComponent('wss://tracker.openwebtorrent.com') +
+    '&ws=' + encodeURIComponent(IA + '/download/' + id + '/');
+}
+async function copyMagnetFor(item, btn) {
+  if (btn) btn.disabled = true;
+  try {
+    const buf = await fetchTorrentBytes(item);
+    if (!buf) { toast('Não consegui buscar o .torrent agora — use “Copiar link .torrent”', 'err'); return; }
+    copyText(await magnetFromTorrent(buf, item.title, item.item), 'Magnet copiado!');
+  } catch (e) { toast('Erro ao gerar o magnet: ' + ((e && e.message) || 'falha'), 'err'); }
+  finally { if (btn) btn.disabled = false; }
+}
+function copyMagnetLive(id) {            // torrent já aberto no WebTorrent: o magnet vem pronto
+  const it = p2pItems.get(id);
+  if (it && it.torrent && it.torrent.magnetURI) copyText(it.torrent.magnetURI, 'Magnet copiado!'); else toast('Magnet indisponível ainda', 'err');
+}
+
 async function openP2PItemModal(item) {
   modal.innerHTML = modalHead(item, item.artist + (item.year ? ' · ' + item.year : '') + ' · Internet Archive') +
-    `<div class="mbar"><button class="btn filled sm" id="p2p-tor">${I.share} Baixar via P2P (torrent)</button><button class="btn ghost sm" id="p2p-http">${I.dl} Baixar faixas direto</button></div>
+    `<div class="mbar"><button class="btn filled sm" id="p2p-tor">${I.share} Baixar via P2P (torrent)</button><button class="btn ghost sm" id="p2p-http">${I.dl} Baixar faixas direto</button><a class="btn tonal sm" id="p2p-torlink" href="${esc(torUrlOf(item.item))}" target="_blank" rel="noopener" style="text-decoration:none">Baixar .torrent</a><button class="btn tonal sm" id="p2p-copytor">Copiar link .torrent</button><button class="btn tonal sm" id="p2p-copymag">Copiar magnet</button></div>
     <p class="mmod" id="p2pmodhint" hidden></p><div class="mlist"><div class="mload">Carregando faixas...</div></div>`;
   openModal();
   $('#mclose').onclick = closeModal;
@@ -1571,6 +1834,9 @@ async function openP2PItemModal(item) {
     lastModalTracks = tracks;
     list.innerHTML = tracks.map((t, i) => modalRow(t, i, t.size ? fmtMB(t.size) : '')).join('');
     const tb = $('#p2p-tor');
+    $('#p2p-copytor').onclick = () => copyText(torUrlOf(item.item), 'Link .torrent copiado!');
+    $('#p2p-copymag').onclick = e => copyMagnetFor(item, e.currentTarget);
+    if (!hasTor) { ['#p2p-torlink', '#p2p-copytor', '#p2p-copymag'].forEach(q => { const el = $(q); if (el) el.hidden = true; }); }
     if (!hasTor) { tb.disabled = true; tb.textContent = 'Sem torrent neste item'; }
     tb.onclick = async () => {
       tb.disabled = true;
@@ -1581,17 +1847,14 @@ async function openP2PItemModal(item) {
   } catch (e) { list.innerHTML = '<div class="mempty">Erro ao carregar as faixas. Feche e tente de novo.</div>'; }
 }
 setInterval(() => {
-  if (!p2pItems.size) return;
-  for (const it of p2pItems.values()) {
-    const pct = Math.round((it.torrent.progress || 0) * 100);
-    const ab = it.files.reduce((a, f) => a + (f.size || 0), 0);
-    const mix = ab > 0 && ab < it.torrent.length * 0.25;
-    $$('.p2ptor[data-tid="' + it.id + '"]').forEach(row => {
-      const bar = row.querySelector('.bar i'); if (bar) bar.style.width = pct + '%';
-      const m = row.querySelector('.p2pmeta');
-      if (m) m.innerHTML = `<span>${pct}%</span><span>${it.torrent.numPeers || 0} peers</span><span>${fmtMB(it.torrent.downloaded || 0)} baixados</span><span>${it.files.length} faixa(s) · ${fmtMB(ab)}</span>${mix ? `<span>torrent total ${fmtMB(it.torrent.length)}</span>` : ''}`;
-    });
+  if ($('#gdl')) {
+    const its = [...p2pItems.values()], c = wtClient;
+    let d = 0, u = 0, pe = 0; its.forEach(x => { d += x.torrent.downloaded || 0; u += x.torrent.uploaded || 0; pe += x.torrent.numPeers || 0; });
+    $('#gdl').textContent = c ? fmtSp(c.downloadSpeed) : '—'; $('#gul').textContent = c ? fmtSp(c.uploadSpeed) : '—';
+    $('#gtn').textContent = its.length; $('#gpe').textContent = pe; $('#grt').textContent = d ? (u / d).toFixed(2) : '—';
   }
+  if (!p2pItems.size) return;
+  for (const it of p2pItems.values()) $$('.p2ptor[data-tid="' + it.id + '"]').forEach(row => p2pPaintRow(it, row));
 }, 900);
 /* a tela de transferências também atualiza o log/linhas em andamento */
 setInterval(() => { if (state.view === 'transfers' && [...dls.values()].some(d => d.status === 'baixando')) paintXfers(); }, 1000);
@@ -1641,10 +1904,14 @@ function openSettings() {
         <select id="cfg-tpl"><option value="artist-title">Artista - Título</option><option value="title-artist">Título - Artista</option><option value="title">Somente Título</option></select></label>
       <label class="field">Downloads simultâneos
         <select id="cfg-conc"><option value="1">1 (um por vez)</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></label>
+      <label class="field">Jamendo client_id <span style="opacity:.7">(grátis em developer.jamendo.com)</span>
+        <input id="cfg-jam" type="text" placeholder="ex.: 1a2b3c4d" autocomplete="off" spellcheck="false"></label>
       <div class="tbar"><button class="btn ghost sm" id="cfg-hist">Limpar histórico de baixadas</button><button class="btn ghost sm" id="cfg-favs">Limpar favoritas</button></div>
     </div>`;
   openModal();
   $('#mclose').onclick = closeModal;
+  $('#cfg-jam').value = cfg.jamId || '';
+  $('#cfg-jam').onchange = e => { cfg.jamId = e.target.value.trim(); jamCache.clear(); saveCfg(); toast(cfg.jamId ? 'Jamendo ativado' : 'Jamendo desativado', 'ok'); };
   $('#cfg-tpl').value = cfg.tpl; $('#cfg-conc').value = String(cfg.conc);
   $('#cfg-tpl').onchange = e => { cfg.tpl = e.target.value; saveCfg(); };
   $('#cfg-conc').onchange = e => { cfg.conc = +e.target.value || 2; saveCfg(); pump(); };
@@ -1661,6 +1928,7 @@ view.addEventListener('error', e => {
 }, true);
 view.addEventListener('click', e => {
   if (e.target.closest('a')) return;
+  if (p2pClick(e)) return;
   const pp = e.target.closest('[data-playp]');
   if (pp) { const pf = p2pFiles.get(pp.dataset.playp); if (pf) playP2P(pf); return; }
   const pd = e.target.closest('[data-dlp]');
@@ -1717,7 +1985,7 @@ function route() {
   const v = state.view, term = state.q || state.genre;
   $('#srcs').hidden = v !== 'search';
   $('#chips').hidden = v !== 'search';
-  $('#eras').hidden = !((v === 'search' && term && state.srcf !== 'ov' && state.srcf !== 'audius') || v === 'albums');
+  $('#eras').hidden = !((v === 'search' && term && state.srcf !== 'ov' && state.srcf !== 'audius' && state.srcf !== 'jam') || v === 'albums');
   paintLayoutBtn();
   if (v === 'favs') {
     head('Suas favoritas', 'Guardadas neste navegador — ouça e baixe quando quiser', true);
@@ -1735,6 +2003,7 @@ function route() {
     searchAll(term);
     return;
   }
+  if (state.srcf === 'jam') { head('Jamendo — Creative Commons', 'Faixas livres em alta, com download liberado pelos artistas', true); loadJam(); return; }
   if (state.srcf === 'ov') { head('Openverse — Creative Commons', 'Faixas livres do Jamendo, Wikimedia e outras plataformas abertas', true); loadOV(); return; }
   if (state.srcf === 'ia') { head('Acervo Livre', 'Álbuns livres do Internet Archive — clique em “Faixas” para ver e baixar', true); loadIA(); return; }
   head('Em alta agora', 'As faixas mais tocadas da semana no Audius — clique para ouvir, baixe o que gostar', true);
@@ -1747,6 +2016,7 @@ window.addEventListener('online', () => toast('Conexão voltou!', 'ok'));
 (function init() {
   paintSrcs(); paintChips(); paintEras(); syncNav();
   $('#np-fav').innerHTML = I.heart;
+  setTimeout(p2pRestore, 2500);
   resolveHosts().then(() => { if (!hosts.length) toast('Audius fora do ar — use Acervo, Álbuns, Openverse ou P2P', 'err'); });
   route();
 })();
