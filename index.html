@@ -297,7 +297,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
     <button id="qclear" class="ib sm qclear" hidden aria-label="Limpar busca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
   </div>
   <span class="spacer"></span>
-  <button id="ytbtn" class="ib" aria-label="Ouvir do YouTube (sem download)" title="Ouvir do YouTube (sem download)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.5 15.5v-7l6.3 3.5z"/></svg></button>
+  <button id="ytbtn" class="ib" aria-label="Ouvir do YouTube" title="YouTube — ouvir e tentar baixar"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.5 15.5v-7l6.3 3.5z"/></svg></button>
   <button id="setbtn" class="ib" aria-label="Configurações" title="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
 </header>
 
@@ -325,7 +325,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
     Fontes abertas e legais: <a href="https://audius.co" target="_blank" rel="noopener">Audius</a>,
     <a href="https://archive.org/details/audio" target="_blank" rel="noopener">Internet Archive</a>,
     <a href="https://openverse.org" target="_blank" rel="noopener">Openverse</a> e torrents do Archive via WebTorrent.<br>
-    YouTube: <b>ouvir</b> pelo embed oficial e <b>baixar MP3</b> via API externa (pode falhar em vídeos restritos). Downloads para uso pessoal; apoie os artistas.
+    YouTube: <b>ouvir</b> e <b>tentar baixar</b> via APIs públicas (Piped/Invidious) — se falharem, o app guia o uso de extensão ou yt-dlp. Downloads para uso pessoal; apoie os artistas.
   </footer>
 </main>
 
@@ -368,6 +368,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-ra
    MusiTop v2 — baixador de músicas 100% no navegador
    UX: Soulseek (resultados em tabela + transferências), yt-dlp (link + log),
        Seal (Material You + fila). Fontes: Jamendo, Audius, Internet Archive, Openverse, P2P.
+   YouTube: ouvir (embed) + tentar baixar via Piped/Invidious (fallback para extensão/yt-dlp).
    ================================================================ */
 
 /* ---------- utils ---------- */
@@ -423,7 +424,7 @@ let hosts = [], hostIdx = 0;
 let cur = null, pqueue = null;
 let shuffle = false, repeat = 'off';
 let errStreak = 0;
-let gen = 0;                       // token anti-corrida: invalida carregamentos antigos
+let gen = 0;
 
 const audio = $('#audio'), player = $('#player'), view = $('#view'), emptyBox = $('#empty');
 const qInput = $('#q'), qClear = $('#qclear');
@@ -1200,7 +1201,7 @@ function renderLink() {
         <button class="btn ghost" type="button" id="pastebtn">${I.paste} Colar</button>
         <button class="btn filled" type="submit">Analisar</button>
       </form>
-      <div class="suprow"><span class="tag">Audius</span><span class="tag alt">Internet Archive</span><span class="tag alt">Link direto de áudio</span><span class="tag p2p">Magnet / .torrent</span><span class="tag">YouTube: ouvir e baixar</span></div>
+      <div class="suprow"><span class="tag">Audius</span><span class="tag alt">Internet Archive</span><span class="tag alt">Link direto de áudio</span><span class="tag p2p">Magnet / .torrent</span><span class="tag">YouTube: ouvir e tentar baixar</span></div>
       <p class="hint">O arquivo é baixado no <b>formato original</b> da fonte (sem conversão — o navegador não roda ffmpeg). Playlists e álbuns mostram a lista de faixas com <b>Baixar tudo</b>.</p>
     </div><div id="linkres"></div>`;
   const inp = $('#linkin');
@@ -1233,11 +1234,9 @@ async function resolveLink(raw) {
   }
   const yid = /youtu/i.test(url) ? ytId(url) : null;
   if (yid) {
-    box.innerHTML = `<div class="panel"><p class="note"><b>YouTube:</b> baixar pode violar os termos deles. Use com responsabilidade. Abaixo você pode <b>ouvir</b> e <b>baixar MP3</b> (a API pode falhar em vídeos restritos).</p>
+    box.innerHTML = `<div class="panel"><p class="note"><b>YouTube:</b> baixar pode violar os termos deles — use com responsabilidade. Você pode <b>ouvir</b> aqui e <b>tentar baixar</b> via APIs públicas (Piped/Invidious). Se todas falharem, o app mostra o caminho manual.</p>
       ${ytEmbed(yid)}</div>`;
-    // Liga o botão de download (criado dinamicamente)
-    const btn = box.querySelector('#yt-download-btn');
-    if (btn) btn.onclick = () => downloadFromYouTube(btn.dataset.vid, btn);
+    bindYtDownloadButton();
     return;
   }
   box.innerHTML = linkLoading;
@@ -1718,27 +1717,62 @@ setInterval(() => {
 }, 900);
 setInterval(() => { if (state.view === 'transfers' && [...dls.values()].some(d => d.status === 'baixando')) paintXfers(); }, 1000);
 
-/* ---------- YouTube: ouvir + baixar ---------- */
-function ytEmbed(id) {
-  const watch = 'https://www.youtube.com/watch?v=' + id;
-  const dlBtn = `<button class="btn filled" id="yt-download-btn" data-vid="${esc(id)}" style="display:inline-flex;align-items:center;gap:8px">${I.dl} Baixar MP3</button>`;
-  // Em file:// o iframe de embed é bloqueado (erro 153), mas o download via API funciona.
-  if (location.protocol === 'file:') {
-    return `<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:12px">
-      <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" style="width:200px;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#000" onerror="this.style.display='none'">
-      <div style="flex:1;min-width:240px"><div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">
-        <a class="btn filled" href="${esc(watch)}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:10px 18px">Abrir no YouTube</a>
-        ${dlBtn}
-      </div>
-      <p class="hint">O player embutido não roda com o arquivo aberto direto (<code>file://</code>, erro 153). O botão <b>Baixar MP3</b> continua funcionando.</p></div></div>`;
+/* ================================================================
+   YouTube: ouvir (embed) + baixar (Piped/Invidious com fallback)
+   ================================================================ */
+
+// Instâncias públicas de Piped e Invidious (podem cair — testamos várias em ordem)
+const YT_PIPED = [
+  'https://pipedapi.kavin.rocks',
+  'https://api.piped.private.coffee',
+  'https://pipedapi.reallyaweso.me'
+];
+const YT_INVIDIOUS = [
+  'https://inv.nadeko.net',
+  'https://invidious.nerdvpn.de',
+  'https://yewtu.be'
+];
+
+// Pede ao Piped o melhor stream de áudio e devolve o Blob
+async function tryPiped(videoId) {
+  for (const host of YT_PIPED) {
+    try {
+      const r = await fetchT(host + '/streams/' + videoId, 12000);
+      if (!r.ok) continue;
+      const j = await r.json();
+      const audios = (j.audioStreams || []).filter(a => a.url && a.mimeType && a.mimeType.startsWith('audio/'));
+      if (!audios.length) continue;
+      audios.sort((a, b) => (b.bitrate || 0) - (a.bitrate || 0));
+      const best = audios[0];
+      const ar = await fetchT(best.url, 60000);
+      if (!ar.ok) continue;
+      const blob = await ar.blob();
+      if (blob.size < 30000) continue;
+      return { blob, ext: best.mimeType.includes('mp4') ? '.m4a' : '.mp3' };
+    } catch (e) { console.warn('[piped]', host, e && e.message); }
   }
-  const origin = encodeURIComponent(location.origin);
-  return `<div class="ytframe"><iframe src="https://www.youtube.com/embed/${esc(id)}?autoplay=1&rel=0&playsinline=1&origin=${origin}" title="Player do YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
-    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-      <a class="btn" href="${esc(watch)}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px">Abrir no YouTube</a>
-      ${dlBtn}
-    </div>
-    <p class="hint" style="margin-top:8px">Não carregou o player? Alguns vídeos bloqueiam embed. O download usa uma API externa e pode falhar em vídeos restritos.</p>`;
+  return null;
+}
+
+async function tryInvidious(videoId) {
+  for (const host of YT_INVIDIOUS) {
+    try {
+      const r = await fetchT(host + '/api/v1/videos/' + videoId, 12000);
+      if (!r.ok) continue;
+      const j = await r.json();
+      const audios = (j.adaptiveFormats || []).filter(a => a.type && a.type.startsWith('audio/') && a.url);
+      if (!audios.length) continue;
+      audios.sort((a, b) => (parseInt(b.bitrate) || 0) - (parseInt(a.bitrate) || 0));
+      const best = audios[0];
+      const ar = await fetchT(best.url, 60000);
+      if (!ar.ok) continue;
+      const blob = await ar.blob();
+      if (blob.size < 30000) continue;
+      const ext = best.type.includes('mp4') ? '.m4a' : '.mp3';
+      return { blob, ext };
+    } catch (e) { console.warn('[invidious]', host, e && e.message); }
+  }
+  return null;
 }
 
 async function downloadFromYouTube(videoId, btn) {
@@ -1747,62 +1781,86 @@ async function downloadFromYouTube(videoId, btn) {
   btn.disabled = true;
   const setStatus = t => { btn.innerHTML = t; };
 
-  // Cada tentativa deve devolver { blob, ext } ou lançar erro.
-  const tryVevioz = async () => {
-    setStatus('⏳ Vevioz...');
-    const r = await fetchT('https://api.vevioz.com/@api/button/mp3/' + encodeURIComponent(videoId), 40000);
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const b = await r.blob();
-    if (b.size < 30000) throw new Error('bloco muito pequeno (' + b.size + 'B)');
-    const ok = /audio|octet-stream/.test(b.type) || b.type === '';
-    if (!ok) throw new Error('tipo inesperado: ' + b.type);
-    return { blob: b, ext: '.mp3' };
-  };
-
-  const tryCobalt = async (host) => {
-    setStatus('⏳ ' + host.replace(/^https?:\/\//, '') + '...');
-    const r = await fetchT(host.replace(/\/$/, ''), 25000, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-      body: JSON.stringify({ url: 'https://www.youtube.com/watch?v=' + videoId, isAudioOnly: true, vQuality: '720', filenameStyle: 'basic' })
-    });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    const u = j.url || (j.picker && j.picker[0] && j.picker[0].url);
-    if (!u) throw new Error('sem url: ' + (j.status || 'desconhecido'));
-    const ar = await fetchT(u, 90000);
-    if (!ar.ok) throw new Error('download HTTP ' + ar.status);
-    const b = await ar.blob();
-    if (b.size < 30000) throw new Error('bloco muito pequeno');
-    return { blob: b, ext: '.mp3' };
-  };
-
   try {
-    const methods = [
-      ['Vevioz', tryVevioz],
-      ['Cobalt (kwiatekmiki)', () => tryCobalt('https://cobalt-api.kwiatekmiki.com')],
-      ['Cobalt (eepy)', () => tryCobalt('https://co.eepy.today')]
-    ];
-    let result = null, lastErr = '';
-    for (const [name, fn] of methods) {
-      try {
-        result = await fn();
-        if (result) break;
-      } catch (e) {
-        lastErr = name + ': ' + ((e && e.message) || 'falha');
-        console.warn('[yt-dl] ' + lastErr);
-      }
+    setStatus('⏳ Procurando stream...');
+    let result = await tryPiped(videoId);
+    if (!result) { setStatus('⏳ Tentando Invidious...'); result = await tryInvidious(videoId); }
+
+    if (result) {
+      const name = 'youtube_' + videoId + result.ext;
+      saveBlob(result.blob, name);
+      toast('Baixado: ' + name, 'ok');
+      btn.disabled = false;
+      btn.innerHTML = orig;
+      return;
     }
-    if (!result) throw new Error(lastErr || 'nenhuma API respondeu');
-    const name = 'youtube_' + videoId + result.ext;
-    saveBlob(result.blob, name);
-    toast('Baixado: ' + name, 'ok');
+
+    // Falhou: mostra instruções claras dentro do modal
+    btn.disabled = false;
+    btn.innerHTML = orig;
+    const box = document.getElementById('ytbox');
+    if (box) {
+      box.insertAdjacentHTML('afterbegin', `
+        <div class="panel" style="margin-bottom:12px;border-color:var(--warn)">
+          <p class="note" style="margin:0">
+            <b>Não consegui baixar dentro do MusiTop agora.</b> As APIs públicas (Piped/Invidious) estão instáveis ou bloqueadas para este vídeo — o YouTube bloqueia ativamente.
+          </p>
+          <div class="tbar" style="margin-top:10px">
+            <a class="btn filled sm" href="https://www.youtube.com/watch?v=${esc(videoId)}" target="_blank" rel="noopener" style="text-decoration:none">
+              Abrir este vídeo no YouTube
+            </a>
+            <a class="btn ghost sm" href="https://addons.mozilla.org/pt-BR/firefox/addon/anydownload-media-downloader/" target="_blank" rel="noopener" style="text-decoration:none">
+              Instalar AnyDownload (Firefox)
+            </a>
+            <a class="btn ghost sm" href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener" style="text-decoration:none">
+              Ver yt-dlp no GitHub
+            </a>
+          </div>
+          <p class="hint" style="margin-top:10px;margin-bottom:0">
+            <b>Como fazer:</b> clique em "Abrir este vídeo no YouTube", depois clique no ícone da extensão AnyDownload na barra do navegador → escolha MP3 → pronto.
+            <br><br>
+            <b>Ou (mais confiável):</b> instale o <code>yt-dlp</code> no seu PC e rode no terminal:
+            <code style="display:block;background:#000;padding:8px;border-radius:6px;margin-top:6px;font-size:.8rem">yt-dlp -x --audio-format mp3 "https://www.youtube.com/watch?v=${esc(videoId)}"</code>
+          </p>
+        </div>`);
+    }
   } catch (e) {
-    toast('Não consegui baixar este vídeo (' + ((e && e.message) || 'erro') + '). Use um app externo como yt-dlp, ou copie o link e use um site como y2mate.', 'err');
-  } finally {
+    toast('Erro: ' + ((e && e.message) || 'falha desconhecida'), 'err');
     btn.disabled = false;
     btn.innerHTML = orig;
   }
+}
+
+function ytEmbed(id) {
+  const watch = 'https://www.youtube.com/watch?v=' + id;
+  const dlBtn = `<button class="btn filled" id="yt-download-btn" data-vid="${esc(id)}" style="display:inline-flex;align-items:center;gap:8px">${I.dl} Baixar MP3</button>`;
+  const helpLink = `<a class="btn ghost" href="${esc(watch)}" target="_blank" rel="noopener" style="text-decoration:none;display:inline-flex;align-items:center;gap:8px">${I.ext} Abrir no YouTube</a>`;
+
+  // Em file:// o iframe de embed é bloqueado (erro 153), mas o download via Piped/Invidious funciona.
+  if (location.protocol === 'file:') {
+    return `<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:12px">
+      <img src="https://i.ytimg.com/vi/${esc(id)}/hqdefault.jpg" alt="" style="width:200px;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#000" onerror="this.style.display='none'">
+      <div style="flex:1;min-width:240px">
+        <div style="margin-bottom:10px;display:flex;gap:8px;flex-wrap:wrap">${helpLink}${dlBtn}</div>
+        <p class="hint">O player embutido não roda em <code>file://</code> (erro 153). O botão <b>Baixar MP3</b> tenta Piped/Invidious. Se falhar, use "Abrir no YouTube" + extensão AnyDownload.</p>
+      </div>
+    </div>`;
+  }
+  const origin = encodeURIComponent(location.origin);
+  return `<div class="ytframe"><iframe src="https://www.youtube.com/embed/${esc(id)}?autoplay=1&rel=0&playsinline=1&origin=${origin}" title="Player do YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">${helpLink}${dlBtn}</div>
+    <p class="hint" style="margin-top:8px">O download tenta APIs públicas (Piped/Invidious). Se todas falharem, o MusiTop te mostra o caminho manual com a extensão AnyDownload.</p>`;
+}
+
+// Liga o clique do botão de download (criado dinamicamente pelo ytEmbed)
+function bindYtDownloadButton() {
+  const box = document.getElementById('ytbox');
+  if (!box || box.dataset.ytBound) return;
+  box.dataset.ytBound = '1';
+  box.addEventListener('click', e => {
+    const b = e.target.closest('#yt-download-btn');
+    if (b) downloadFromYouTube(b.dataset.vid, b);
+  });
 }
 
 function ytId(u) {
@@ -1813,9 +1871,10 @@ function ytId(u) {
 }
 function openYt() {
   modal.innerHTML = `<div class="mhead"><div class="mi"><b>Ouvir e baixar do YouTube</b><span>player oficial + extração de áudio</span></div><button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>
-    <div class="mbody"><p class="note"><b>Sobre o YouTube:</b> baixar pode violar os termos deles. Use com responsabilidade, apenas para conteúdo livre ou de sua autoria. O player embutido funciona no modo "Ouvir".</p>
+    <div class="mbody"><p class="note"><b>Sobre o YouTube:</b> baixar pode violar os termos deles — use com responsabilidade, apenas para conteúdo livre ou de sua autoria. O player embutido funciona no modo "Ouvir".</p>
     <form class="frm" id="ytform"><input id="yturl" placeholder="Cole o link do YouTube" spellcheck="false" autocomplete="off" aria-label="Link do YouTube"><button class="btn filled" type="submit">Ouvir</button></form><div id="ytbox"></div></div>`;
   openModal();
+  bindYtDownloadButton();
   $('#mclose').onclick = closeModal;
   $('#ytform').onsubmit = e => {
     e.preventDefault();
@@ -1823,11 +1882,6 @@ function openYt() {
     if (!id) { box.innerHTML = '<p class="note err">Link não reconhecido. Copie o endereço completo do vídeo.</p>'; return; }
     box.innerHTML = `${ytEmbed(id)}`;
   };
-  // Delegação de evento: o botão é criado dinamicamente pelo ytEmbed
-  $('#ytbox').addEventListener('click', e => {
-    const b = e.target.closest('#yt-download-btn');
-    if (b) downloadFromYouTube(b.dataset.vid, b);
-  });
 }
 $('#ytbtn').onclick = openYt;
 
