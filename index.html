@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>MusiTop — Baixe músicas grátis direto no navegador</title>
+<meta name="description" content="Busque, ouça e baixe músicas livres: Audius, Internet Archive, Openverse e álbuns via P2P. Cole links, acompanhe transferências e o log, tudo no navegador.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2080%2080%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20rx%3D%2218%22%20fill%3D%22%2366d19e%22%2F%3E%3Ccircle%20cx%3D%2230%22%20cy%3D%2255%22%20r%3D%229%22%20fill%3D%22%23003920%22%2F%3E%3Ccircle%20cx%3D%2256%22%20cy%3D%2249%22%20r%3D%229%22%20fill%3D%22%23003920%22%2F%3E%3Crect%20x%3D%2235%22%20y%3D%2224%22%20width%3D%224%22%20height%3D%2231%22%20fill%3D%22%23003920%22%2F%3E%3Crect%20x%3D%2261%22%20y%3D%2218%22%20width%3D%224%22%20height%3D%2231%22%20fill%3D%22%23003920%22%2F%3E%3Cpath%20d%3D%22M35%2024l30-8v8l-30%208z%22%20fill%3D%22%23003920%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e1210;--s1:#161b18;--s2:#1c221f;--s3:#242b27;--s4:#2c342f;
+  --line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.17);
+  --text:#e1e6e1;--muted:#9fa9a2;--muted2:#68736c;
+  --p:#7fd8a6;--onp:#00391f;--pc:#0c4f31;--onpc:#9bf5c1;
+  --t:#a3cdda;--err:#ffb4ab;--warn:#f3c969;--ok:#7fd8a6;
+  --ph:96px;--r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Roboto',system-ui,-apple-system,'Segoe UI',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:calc(var(--ph) + 24px)}
+::selection{background:rgba(127,216,166,.35)}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+a{color:inherit}
+img{display:block}
+[hidden]{display:none!important}
+
+/* ---------- app bar ---------- */
+.appbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:12px;padding:10px clamp(12px,3vw,28px);background:rgba(14,18,16,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.2rem;white-space:nowrap}
+.lmark{width:34px;height:34px;border-radius:11px;background:var(--p);color:var(--onp);display:grid;place-items:center}
+.lmark svg{width:19px;height:19px}
+.searchbar{position:relative;flex:1 1 280px;max-width:660px;min-width:150px}
+.searchbar .sico{position:absolute;left:16px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--muted);pointer-events:none}
+#q{width:100%;height:46px;border-radius:26px;border:none;background:var(--s3);padding:0 44px;color:var(--text);font:inherit;font-size:.95rem;outline:2px solid transparent;transition:outline-color .15s,background .15s}
+#q::placeholder{color:var(--muted2)}
+#q:focus{outline-color:var(--p);background:var(--s2)}
+#q::-webkit-search-cancel-button{display:none}
+.qclear{position:absolute;right:6px;top:50%;transform:translateY(-50%)}
+.appbar .spacer{flex:1}
+.ib{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--muted);transition:.15s;flex:0 0 auto}
+.ib:hover{background:var(--s3);color:var(--text)}
+.ib.on{color:#ff8fb1}
+.ib svg{width:18px;height:18px}
+.ib.dlb:hover{background:var(--pc);color:var(--onpc)}
+.ib.sm{width:32px;height:32px}
+.ib.sm svg{width:16px;height:16px}
+
+/* ---------- nav ---------- */
+.nav{display:flex;gap:4px;overflow-x:auto;padding:10px clamp(12px,3vw,28px) 0;scrollbar-width:none;border-bottom:1px solid var(--line)}
+.nav::-webkit-scrollbar{display:none}
+.nav button{position:relative;padding:11px 16px 12px;font-size:.88rem;font-weight:500;color:var(--muted);white-space:nowrap;border-bottom:3px solid transparent;border-radius:8px 8px 0 0;display:inline-flex;gap:7px;align-items:center}
+.nav button:hover{color:var(--text);background:var(--s2)}
+.nav button.active{color:var(--p);border-bottom-color:var(--p)}
+.nbadge{min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--p);color:var(--onp);font-size:.68rem;font-weight:700;display:grid;place-items:center}
+
+/* ---------- filtros ---------- */
+.frow{display:flex;gap:8px;overflow-x:auto;padding:12px clamp(12px,3vw,28px) 0;scrollbar-width:none;align-items:center}
+.frow::-webkit-scrollbar{display:none}
+.flab{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted2);flex:0 0 auto;margin-right:2px}
+.chip{height:32px;padding:0 14px;border-radius:8px;border:1px solid var(--line2);font-size:.82rem;color:var(--muted);white-space:nowrap;flex:0 0 auto;display:inline-flex;align-items:center;text-decoration:none;transition:.15s}
+.chip:hover{color:var(--text);background:var(--s2)}
+.chip.active{background:var(--pc);color:var(--onpc);border-color:transparent;font-weight:500}
+
+/* ---------- conteúdo ---------- */
+main{max-width:1380px;margin:0 auto;padding:6px clamp(12px,3vw,28px) 0}
+.shead{display:flex;align-items:flex-end;gap:12px;margin:18px 2px 14px}
+.shead>div{flex:1;min-width:0}
+.shead h2{font-size:clamp(1.2rem,2.4vw,1.55rem);font-weight:500}
+.shead p{color:var(--muted);font-size:.88rem;margin-top:3px}
+.btn{height:40px;padding:0 20px;border-radius:20px;font-weight:500;font-size:.88rem;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.15s;white-space:nowrap;text-decoration:none}
+.btn svg{width:17px;height:17px;flex:0 0 auto}
+.btn.filled{background:var(--p);color:var(--onp)}
+.btn.tonal{background:var(--pc);color:var(--onpc)}
+.btn.ghost{border:1px solid var(--line2);color:var(--muted)}
+.btn.sm{height:32px;padding:0 14px;font-size:.8rem}
+.btn:hover{filter:brightness(1.12)}
+.btn.ghost:hover{color:var(--text);filter:none;background:var(--s2)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+
+/* lista estilo Soulseek */
+.list{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.lhead,.row{display:grid;grid-template-columns:44px minmax(0,1fr) 92px 112px 56px 130px;gap:10px;align-items:center;padding:8px 14px}
+.lhead{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);background:var(--s2);border-bottom:1px solid var(--line);padding-top:10px;padding-bottom:10px}
+.row{border-bottom:1px solid var(--line);transition:background .12s}
+.row:last-child{border-bottom:none}
+.row:hover{background:var(--s2)}
+.thumb{position:relative;width:44px;height:44px;border-radius:10px;overflow:hidden;background:var(--s3);display:block}
+.thumb img{width:100%;height:100%;object-fit:cover}
+.thumb .pi{position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.5);color:#fff;opacity:0;transition:.15s}
+.thumb .pi svg{width:20px;height:20px}
+.thumb:hover .pi,.row.now .thumb .pi{opacity:1}
+.c-name{min-width:0}
+.nm{display:block;font-size:.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.nm:hover{text-decoration:underline;text-decoration-color:var(--muted2)}
+.ar{display:block;font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.dled{font-style:normal;color:var(--ok);font-weight:500}
+.c-info,.c-dur{font-size:.8rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums}
+.c-act{display:flex;justify-content:flex-end;align-items:center;gap:2px}
+.tag{font-size:.68rem;font-weight:700;letter-spacing:.02em;padding:2px 8px;border-radius:6px;background:var(--s4);color:var(--muted);display:inline-block;white-space:nowrap}
+.tag.alt{color:var(--t)}.tag.cc{color:#b9e79b}.tag.p2p{color:#ffb2c0}.tag.ok{color:var(--ok)}
+
+/* grade */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(184px,1fr));gap:14px}
+.card{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:3px;transition:.18s;cursor:pointer}
+.card:hover{background:var(--s2);border-color:var(--line2);transform:translateY(-3px)}
+.cover{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;background:var(--s3);margin-bottom:6px}
+.cover img{width:100%;height:100%;object-fit:cover}
+.cover .cp{position:absolute;inset:0;margin:auto;width:48px;height:48px;border-radius:50%;background:var(--p);color:var(--onp);display:grid;place-items:center;opacity:0;transform:scale(.8);transition:.2s}
+.cover .cp svg{width:22px;height:22px}
+.card:hover .cp{opacity:1;transform:none}
+.cover .dur{position:absolute;bottom:7px;right:7px;font-size:.7rem;font-weight:500;background:rgba(0,0,0,.65);padding:2px 7px;border-radius:6px}
+.card .t-title{font-size:.9rem;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.34em}
+.card .t-artist{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .t-meta{display:flex;gap:8px;align-items:center;font-size:.72rem;color:var(--muted2);margin-top:3px;min-height:20px}
+.card .t-act{display:flex;gap:6px;align-items:center;margin-top:8px}
+.card .t-act .btn{flex:1}
+
+/* painéis */
+.panel{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);padding:20px;display:flex;flex-direction:column;gap:14px;margin-bottom:16px}
+.panel h3{display:flex;align-items:center;gap:9px;font-size:1.05rem;font-weight:500}
+.panel h3 svg{width:19px;height:19px;color:var(--p)}
+.hint{color:var(--muted);font-size:.86rem;line-height:1.6}
+.hint b{color:var(--text)}
+.frm{display:flex;gap:10px;flex-wrap:wrap}
+.frm input{flex:1 1 280px;height:48px;padding:0 18px;border-radius:14px;border:1px solid var(--line2);background:var(--bg);color:var(--text);font:inherit;font-size:.92rem;outline:2px solid transparent;transition:.15s}
+.frm input:focus{border-color:var(--p);outline-color:rgba(127,216,166,.25)}
+.frm.big .btn{height:48px;border-radius:14px}
+.note{font-size:.85rem;line-height:1.6;color:var(--muted);background:rgba(243,201,105,.08);border:1px solid rgba(243,201,105,.3);padding:11px 14px;border-radius:12px}
+.note b{color:var(--text)}
+.note.err{background:rgba(255,180,171,.08);border-color:rgba(255,180,171,.4);color:var(--err)}
+.note.ok{background:rgba(127,216,166,.08);border-color:rgba(127,216,166,.35)}
+.suprow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.linkcard{flex-direction:row;align-items:center;flex-wrap:wrap}
+.linkcard>img{width:96px;height:96px;border-radius:14px;object-fit:cover;background:var(--s3)}
+.lc-i{flex:1 1 220px;min-width:0;display:flex;flex-direction:column;gap:6px}
+.lc-i b{font-size:1.05rem;font-weight:500}
+.lc-i span.s{color:var(--muted);font-size:.86rem}
+.lc-a{display:flex;gap:8px;flex-wrap:wrap}
+.mload,.mempty{padding:40px 22px;text-align:center;color:var(--muted);font-size:.9rem;line-height:1.6}
+.pmore{font-size:.8rem;color:var(--muted2);padding:4px 2px;line-height:1.6}
+.pmore b{color:var(--muted)}
+.sub-h{font-size:.95rem;font-weight:500;margin:20px 2px 10px}
+
+/* barra de progresso */
+.bar{height:5px;border-radius:3px;background:rgba(255,255,255,.09);overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:3px;background:var(--p);transition:width .3s}
+
+/* transferências */
+.xlist{background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.xhead,.xrow{display:grid;grid-template-columns:44px minmax(0,1fr) 110px 92px 62px 106px;gap:10px;align-items:center;padding:9px 14px}
+.xhead{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted2);background:var(--s2);border-bottom:1px solid var(--line)}
+.xrow{border-bottom:1px solid var(--line)}
+.xrow:last-child{border-bottom:none}
+.xrow img{width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--s3)}
+.xmain{min-width:0;display:flex;flex-direction:column;gap:5px}
+.xmain b{font-size:.88rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xmain span{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.xst,.xsp,.xeta{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.xrow.ok .xst{color:var(--ok)}.xrow.erro .xst{color:var(--err)}.xrow.baixando .xst{color:var(--p)}
+.xrow.ok .bar i{background:var(--ok)}.xrow.erro .bar i{background:var(--err)}
+.xempty{padding:36px 20px;text-align:center;color:var(--muted2);font-size:.88rem;line-height:1.7}
+.tbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.console{background:#090c0a;border:1px solid var(--line);border-radius:12px;font:12px/1.6 'Roboto Mono',ui-monospace,monospace;max-height:260px;min-height:90px;overflow:auto;padding:12px 14px;white-space:pre-wrap;word-break:break-all;color:var(--muted)}
+.console .i{color:var(--t)}.console .d{color:var(--p)}.console .e{color:var(--err)}.console .w{color:var(--warn)}
+
+/* P2P */
+.p2ptor{background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+.p2phead{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.p2phead b{flex:1;min-width:0;font-size:.92rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.p2pmeta{display:flex;gap:16px;flex-wrap:wrap;font-size:.76rem;color:var(--muted2);margin-top:8px}
+.pfiles{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.pfile{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;background:rgba(255,255,255,.03)}
+.pfile b{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400;font-size:.84rem}
+.pfile .pfs{color:var(--muted2);font-size:.73rem;flex:0 0 auto}
+.p2phint{font-size:.84rem;color:var(--muted);line-height:1.7}
+.p2phint.err{color:var(--err)}
+.p2phint .chip{margin:6px 8px 0 0}
+details.adv{border:1px dashed var(--line2);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:12px}
+details.adv summary{cursor:pointer;font-size:.86rem;font-weight:500;color:var(--muted)}
+details.adv summary:hover{color:var(--text)}
+details.adv>*+*{margin-top:12px}
+
+/* drawer/ modal / toasts */
+.modal-ov{position:fixed;inset:0;z-index:65;background:rgba(4,6,5,.72);backdrop-filter:blur(5px);display:grid;place-items:center;padding:16px;opacity:0;pointer-events:none;transition:.2s}
+.modal-ov.open{opacity:1;pointer-events:auto}
+.modal{width:min(640px,100%);max-height:min(82vh,740px);display:flex;flex-direction:column;background:var(--s1);border:1px solid var(--line2);border-radius:24px;overflow:hidden;transform:translateY(14px) scale(.97);transition:.22s;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.modal-ov.open .modal{transform:none}
+.mhead{display:flex;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line);align-items:center;flex-wrap:wrap}
+.mhead img{width:60px;height:60px;border-radius:12px;object-fit:cover;background:var(--s3)}
+.mhead .mi{flex:1 1 160px;min-width:0}
+.mhead .mi b{display:block;font-size:1rem;font-weight:500;line-height:1.3}
+.mhead .mi span{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+.mbar{display:flex;gap:8px;padding:12px 18px 0;flex-wrap:wrap}
+.mmod{padding:10px 18px 2px;font-size:.83rem;color:var(--muted);line-height:1.8}
+.mmod .chip{margin:4px 6px 4px 0}
+.mlist{overflow-y:auto;flex:1}
+.mrow{display:flex;align-items:center;gap:8px;padding:8px 18px;border-bottom:1px solid var(--line)}
+.mrow:last-child{border-bottom:none}
+.mrow:hover{background:var(--s2)}
+.mnum{min-width:20px;text-align:right;color:var(--muted2);font-size:.75rem;font-variant-numeric:tabular-nums}
+.mtt{flex:1;min-width:0}
+.mtt b{display:block;font-size:.86rem;font-weight:400;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mtt span{font-size:.72rem;color:var(--muted2)}
+.mbody{padding:18px;display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.field{display:flex;flex-direction:column;gap:6px;font-size:.84rem;color:var(--muted)}
+.field select{height:44px;border-radius:12px;border:1px solid var(--line2);background:var(--bg);color:var(--text);font:inherit;padding:0 12px}
+.ytframe{aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:#000}
+.ytframe iframe{width:100%;height:100%;border:0;display:block}
+.toasts{position:fixed;right:16px;bottom:calc(var(--ph) + 14px);z-index:70;display:flex;flex-direction:column;gap:8px;align-items:flex-end;pointer-events:none}
+.toast{max-width:min(380px,88vw);padding:12px 16px;border-radius:12px;font-size:.86rem;background:#2d3631;color:var(--text);box-shadow:0 10px 30px rgba(0,0,0,.5);animation:tin .25s ease}
+.toast.ok{border-left:4px solid var(--ok)}.toast.err{border-left:4px solid var(--err)}
+.toast.out{opacity:0;transform:translateY(8px);transition:.3s}
+@keyframes tin{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* vazio / skeleton */
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:64px 20px;color:var(--muted)}
+.empty .eico{width:70px;height:70px;border-radius:50%;background:var(--s2);display:grid;place-items:center}
+.empty .eico svg{width:32px;height:32px;color:var(--muted2)}
+.empty h3{color:var(--text);font-size:1.1rem;font-weight:500}
+.empty p{max-width:430px;font-size:.9rem;line-height:1.55}
+.skels{display:flex;flex-direction:column;gap:2px;background:var(--s1);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.skel{height:62px;position:relative;overflow:hidden;background:var(--s1)}
+.skel::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.05) 50%,transparent 70%);animation:shine 1.4s infinite}
+@keyframes shine{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+.foot{margin:36px 0 10px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted2);font-size:.8rem;line-height:1.7;text-align:center}
+.foot a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--muted2)}
+
+/* player */
+.player{position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:minmax(200px,1fr) minmax(0,2fr) minmax(200px,1fr);align-items:center;gap:16px;padding:10px clamp(12px,3vw,28px);background:rgba(18,24,21,.95);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--line);padding-bottom:max(10px,env(safe-area-inset-bottom))}
+.np{display:flex;align-items:center;gap:12px;min-width:0}
+.np-art{width:54px;height:54px;border-radius:12px;overflow:hidden;background:var(--s3);flex:0 0 auto;display:grid;place-items:center;color:var(--muted2)}
+.np-art img{width:100%;height:100%;object-fit:cover}
+.np-art svg{width:22px;height:22px}
+.np-info{min-width:0}
+.np-title{font-weight:500;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.np-artist{font-size:.78rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.center{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.controls{display:flex;align-items:center;gap:6px}
+.playbtn{width:46px;height:46px;border-radius:50%;background:var(--p);color:var(--onp);display:grid;place-items:center;transition:.15s;margin:0 6px}
+.playbtn:hover{transform:scale(1.07)}
+.playbtn svg{width:21px;height:21px}
+.act.on{color:var(--p)}
+.seekrow{display:flex;align-items:center;gap:10px;width:100%;max-width:620px}
+.seekrow span{font-size:.72rem;color:var(--muted2);font-variant-numeric:tabular-nums;min-width:36px;text-align:center}
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer;height:20px}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:rgba(255,255,255,.14)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;border-radius:50%;background:var(--p);margin-top:-4.5px}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:rgba(255,255,255,.14)}
+input[type=range]::-moz-range-thumb{width:13px;height:13px;border:none;border-radius:50%;background:var(--p)}
+#seek{flex:1}
+#seek::-webkit-slider-runnable-track{background:linear-gradient(90deg,var(--p) var(--fill,0%),rgba(255,255,255,.14) var(--fill,0%))}
+#seek::-moz-range-track{background:linear-gradient(90deg,var(--p) var(--fill,0%),rgba(255,255,255,.14) var(--fill,0%))}
+#vol{width:90px}
+.right{display:flex;align-items:center;justify-content:flex-end;gap:6px}
+.viz{display:flex;align-items:flex-end;gap:3px;height:24px;margin-right:6px}
+.viz i{width:4px;border-radius:2px;background:var(--p);height:20%;animation:vz 1s ease-in-out infinite alternate;animation-play-state:paused;opacity:.35}
+.player.playing .viz i{animation-play-state:running;opacity:1}
+.viz i:nth-child(1){animation-delay:-.9s}.viz i:nth-child(2){animation-delay:-.7s}.viz i:nth-child(3){animation-delay:-.5s}.viz i:nth-child(4){animation-delay:-.3s}.viz i:nth-child(5){animation-delay:-.6s}
+@keyframes vz{from{height:16%}to{height:100%}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+
+@media(max-width:960px){
+  .lhead,.row{grid-template-columns:44px minmax(0,1fr) 84px 52px 120px}
+  .lhead .h-info,.row .c-info{display:none}
+  .xhead,.xrow{grid-template-columns:44px minmax(0,1fr) 90px 62px 100px}
+  .xhead .h-sp,.xrow .xsp{display:none}
+  .right #vol{display:none}
+}
+@media(max-width:760px){
+  :root{--ph:150px}
+  .appbar{flex-wrap:wrap;gap:8px}
+  .searchbar{order:3;flex:1 1 100%;max-width:none}
+  .lhead{display:none}
+  .row{grid-template-columns:44px minmax(0,1fr) auto;padding:8px 10px}
+  .row .c-src,.row .c-dur{display:none}
+  .xhead{display:none}
+  .xrow{grid-template-columns:44px minmax(0,1fr) auto}
+  .xrow .xsp,.xrow .xeta{display:none}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
+  .player{grid-template-columns:1fr auto;grid-template-rows:auto auto;gap:6px}
+  .center{grid-column:1/-1;grid-row:2}
+  .viz{display:none}
+  .toasts{left:10px;right:10px;align-items:center}
+}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="logo"><span class="lmark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></span>MusiTop</div>
+  <div class="searchbar">
+    <svg class="sico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+    <input id="q" type="search" placeholder="Buscar música, artista, álbum — ou cole um link" autocomplete="off" spellcheck="false" aria-label="Buscar músicas ou colar link">
+    <button id="qclear" class="ib sm qclear" hidden aria-label="Limpar busca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+  </div>
+  <span class="spacer"></span>
+  <button id="ytbtn" class="ib" aria-label="Ouvir do YouTube (sem download)" title="Ouvir do YouTube (sem download)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8zM9.5 15.5v-7l6.3 3.5z"/></svg></button>
+  <button id="setbtn" class="ib" aria-label="Configurações" title="Configurações"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+</header>
+
+<nav class="nav" id="nav" role="tablist" aria-label="Seções">
+  <button data-view="search" class="active" role="tab">Buscar</button>
+  <button data-view="link" role="tab">Link</button>
+  <button data-view="albums" role="tab">Álbuns</button>
+  <button data-view="p2p" role="tab">P2P</button>
+  <button data-view="favs" role="tab">Favoritas</button>
+  <button data-view="transfers" role="tab">Transferências <span id="nbadge" class="nbadge" hidden>0</span></button>
+</nav>
+
+<div class="frow" id="srcs" aria-label="Fonte"></div>
+<div class="frow" id="chips" aria-label="Gêneros"></div>
+<div class="frow" id="eras" hidden aria-label="Época"></div>
+
+<main>
+  <div class="shead">
+    <div><h2 id="sec-title">Em alta agora</h2><p id="sec-sub"></p></div>
+    <button id="layoutbtn" class="ib" aria-label="Alternar lista/grade" title="Alternar lista/grade"></button>
+  </div>
+  <div id="view" aria-live="polite"></div>
+  <div class="empty" id="empty" hidden></div>
+  <footer class="foot">
+    Fontes abertas e legais: <a href="https://audius.co" target="_blank" rel="noopener">Audius</a>,
+    <a href="https://archive.org/details/audio" target="_blank" rel="noopener">Internet Archive</a>,
+    <a href="https://openverse.org" target="_blank" rel="noopener">Openverse</a> e torrents do Archive via WebTorrent.<br>
+    YouTube: só <b>ouvir</b> (embed oficial) — o download de lá não é permitido pelos termos deles. Downloads para uso pessoal; apoie os artistas.
+  </footer>
+</main>
+
+<div id="modal-ov" class="modal-ov" role="dialog" aria-modal="true" aria-label="Detalhes"><div class="modal" id="modal"></div></div>
+<div id="toasts" class="toasts" aria-live="polite"></div>
+
+<footer class="player" id="player" aria-label="Player de música">
+  <div class="np">
+    <div class="np-art" id="np-art"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div>
+    <div class="np-info"><div class="np-title" id="np-title">Nada tocando</div><div class="np-artist" id="np-artist">Escolha uma faixa para começar</div></div>
+    <button class="ib" id="np-fav" aria-label="Favoritar faixa atual" title="Favoritar"></button>
+  </div>
+  <div class="center">
+    <div class="controls">
+      <button class="ib act" id="btn-shuffle" aria-label="Aleatório" title="Aleatório"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M4 20 21 3"/><path d="M21 16v5h-5"/><path d="m15 15 6 6"/><path d="M4 4l5 5"/></svg></button>
+      <button class="ib act" id="btn-prev" aria-label="Anterior" title="Anterior"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 20 9 12l10-8v16zM7 19V5H5v14h2z"/></svg></button>
+      <button class="playbtn" id="btn-play" aria-label="Tocar ou pausar" title="Tocar / pausar">
+        <svg id="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        <svg id="ic-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+      </button>
+      <button class="ib act" id="btn-next" aria-label="Próxima" title="Próxima"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m5 4 10 8-10 8V4zM17 4h2v16h-2z"/></svg></button>
+      <button class="ib act" id="btn-repeat" aria-label="Repetir" title="Repetir"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg></button>
+    </div>
+    <div class="seekrow"><span id="t-cur">0:00</span><input id="seek" type="range" min="0" max="1000" value="0" aria-label="Progresso"><span id="t-dur">0:00</span></div>
+  </div>
+  <div class="right">
+    <div class="viz" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <button class="ib" id="np-dl" aria-label="Baixar faixa atual" title="Baixar esta faixa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/></svg></button>
+    <input id="vol" type="range" min="0" max="100" value="90" aria-label="Volume">
+  </div>
+</footer>
+
+<audio id="audio" preload="auto"></audio>
+<input type="file" id="p2pfile" accept=".torrent,application/x-bittorrent" hidden>
+<noscript><div style="padding:20px;text-align:center">O MusiTop precisa de JavaScript ativado.</div></noscript>
+
+<script>
+'use strict';
+/* ================================================================
+   MusiTop v2 — baixador de músicas 100% no navegador
+   UX: Soulseek (resultados em tabela + transferências), yt-dlp (link + log),
+       Seal (Material You + fila). Fontes: Audius, Internet Archive, Openverse, P2P.
+   ================================================================ */
+
+/* ---------- utils ---------- */
+const $  = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const esc = s => String(s ?? '').replace(/[&<>"'`]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#96;'}[c]));
+const fmtT = s => { if (!isFinite(s) || s < 0) s = 0; s = Math.round(s); return Math.floor(s/60) + ':' + String(s%60).padStart(2,'0'); };
+const fmtN = n => { n = n||0; if (n >= 1e6) return (n/1e6).toFixed(1).replace('.',',')+' mi'; if (n >= 1e3) return (n/1e3).toFixed(1).replace('.',',')+' mil'; return String(n); };
+const fmtMB = b => { b = b||0; if (b >= 1048576) return (b/1048576).toFixed(1).replace('.',',')+' MB'; return Math.round(b/1024)+' KB'; };
+const mib = b => ((b||0)/1048576).toFixed(2) + 'MiB';
+const fmtSp = b => !b ? '—' : b >= 1048576 ? (b/1048576).toFixed(2)+' MiB/s' : Math.round(b/1024)+' KiB/s';
+const fmtETA = s => { if (!isFinite(s) || s <= 0) return '—'; s = Math.round(s); return String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0'); };
+const sanitize = s => String(s).replace(/[\\/:*?"<>|]+/g,'-').replace(/\s+/g,' ').trim().slice(0,120) || 'musica';
+const encPath = p => String(p).split('/').map(encodeURIComponent).join('/');
+const PLACE = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect width="120" height="120" rx="18" fill="#1c221f"/><circle cx="45" cy="82" r="12" fill="#3a4540"/><circle cx="81" cy="73" r="12" fill="#3a4540"/><rect x="53" y="39" width="6" height="43" fill="#3a4540"/><rect x="89" y="30" width="6" height="43" fill="#3a4540"/><path d="M53 39l42-10v10l-42 10z" fill="#3a4540"/></svg>');
+
+function fetchT(url, ms = 12000, opts = {}) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  return fetch(url, { ...opts, signal: ctl.signal }).finally(() => clearTimeout(t));
+}
+
+/* ---------- ícones ---------- */
+const svg = (d, extra = '') => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' + extra + '>' + d + '</svg>';
+const I = {
+  play:  '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  heart: svg('<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/>'),
+  heartF:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7z"/></svg>',
+  dl:    svg('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>'),
+  check: svg('<path d="M20 6 9 17l-5-5"/>'),
+  ext:   svg('<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/>'),
+  retry: svg('<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/>'),
+  music: svg('<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>'),
+  sad:   svg('<circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2"/><path d="M9 9h.01M15 9h.01"/>'),
+  folder:svg('<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>'),
+  share: svg('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="m8.6 13.5 6.8 4M15.4 6.5l-6.8 4"/>'),
+  disc:  svg('<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/>'),
+  x:     svg('<path d="M18 6 6 18M6 6l12 12"/>'),
+  link:  svg('<path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/>'),
+  list:  svg('<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'),
+  grid:  svg('<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>'),
+  term:  svg('<path d="m4 17 6-6-6-6"/><path d="M12 19h8"/>'),
+  paste: svg('<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>')
+};
+
+/* ---------- estado ---------- */
+const APP = 'MusiTopWeb';
+const FALLBACK_HOSTS = ['https://api.audius.co', 'https://discoveryprovider.audius.co'];
+const IA = 'https://archive.org';
+const state = { view:'search', genre:'', era:'', q:'', srcf:'all', layout:'list', tracks:[] };
+const catalog = new Map();
+let hosts = [], hostIdx = 0;
+let cur = null, pqueue = null;
+let shuffle = false, repeat = 'off';
+let errStreak = 0;
+let gen = 0;                       // token anti-corrida: invalida carregamentos antigos
+
+const audio = $('#audio'), player = $('#player'), view = $('#view'), emptyBox = $('#empty');
+const qInput = $('#q'), qClear = $('#qclear');
+
+/* ---------- storage / config ---------- */
+const lsGet = (k, d) => { try { const v = JSON.parse(localStorage.getItem(k)); return v ?? d; } catch { return d; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const cfg = Object.assign({ tpl:'artist-title', conc:2, layout:'list' }, lsGet('mt_cfg', {}));
+state.layout = cfg.layout === 'grid' ? 'grid' : 'list';
+const saveCfg = () => lsSet('mt_cfg', cfg);
+const getFavs = () => lsGet('mt_favs', []);
+const isFav = id => getFavs().some(f => f.id === id);
+const dledIds = () => new Set(lsGet('mt_dls', []));
+const markDled = id => { const s = [...dledIds()]; if (!s.includes(id)) { s.push(id); lsSet('mt_dls', s.slice(-500)); } };
+
+function toast(msg, type = '') {
+  const el = document.createElement('div');
+  el.className = 'toast ' + type;
+  el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 350); }, 3400);
+}
+
+/* ---------- Audius ---------- */
+async function resolveHosts() {
+  try {
+    const r = await fetchT('https://api.audius.co', 9000);
+    const j = await r.json();
+    if (Array.isArray(j.data)) hosts = j.data.filter(h => typeof h === 'string' && h.startsWith('https://'));
+  } catch {}
+  for (const h of FALLBACK_HOSTS) if (!hosts.includes(h)) hosts.push(h);
+}
+const apiBase = () => hosts[hostIdx] || FALLBACK_HOSTS[0];
+async function api(path, ms = 12000) {
+  let lastErr;
+  if (!hosts.length) hosts = FALLBACK_HOSTS.slice();
+  const tries = Math.min(hosts.length, 4);
+  for (let n = 0; n < tries; n++) {
+    const idx = (hostIdx + n) % hosts.length;
+    try {
+      const r = await fetchT(hosts[idx] + path + (path.includes('?') ? '&' : '?') + 'app_name=' + APP, ms);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const j = await r.json();
+      hostIdx = idx;
+      return j;
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('sem conexão');
+}
+
+/* ---------- normalização ---------- */
+function normA(t) {
+  if (!t || t.is_delete || !t.id) return null;
+  const streamable = (t.is_streamable ?? true) !== false && (t.is_available ?? true) !== false;
+  const art = (t.artwork && (t.artwork['480x480'] || t.artwork['150x150'] || t.artwork['1000x1000'])) ||
+              (t.user && t.user.profile_picture && (t.user.profile_picture['480x480'] || t.user.profile_picture['150x150'])) || '';
+  return {
+    id: 'a:' + t.id, src: 'audius', rid: t.id,
+    title: t.title || 'Sem título',
+    artist: (t.user && (t.user.name || t.user.handle)) || 'Desconhecido',
+    duration: t.duration || 0, plays: t.play_count ?? 0,
+    art, genre: t.genre || '', streamable,
+    permalink: t.permalink ? 'https://audius.co' + t.permalink : null
+  };
+}
+function normOv(r) {
+  if (!r || !r.url) return null;
+  return {
+    id: 'o:' + r.id, src: 'ov', rid: r.id,
+    title: r.title || 'Sem título', artist: r.creator || 'Desconhecido',
+    duration: Math.round((r.duration || 0) / 1000),      // Openverse entrega em milissegundos
+    art: r.thumbnail || '', license: r.license ? String(r.license).toUpperCase() : '',
+    url: r.url, name: 'x.' + (r.filetype || 'mp3'),
+    permalink: r.foreign_landing_url || null, plays: 0, streamable: true
+  };
+}
+function normPl(p) {
+  if (!p || !p.id) return null;
+  const art = (p.artwork && (p.artwork['480x480'] || p.artwork['150x150'] || p.artwork['1000x1000'])) ||
+              (p.cover_art && (p.cover_art['480x480'] || p.cover_art['150x150'])) || '';
+  return {
+    id: 'apl:' + p.id, src: 'pl', rid: p.id,
+    title: p.playlist_name || 'Coletânea',
+    artist: (p.user && (p.user.name || p.user.handle)) || 'Coletânea Audius',
+    art, plays: p.favorite_count || 0, total: p.track_count || 0
+  };
+}
+const register = list => { for (const t of list) if (t && t.id) catalog.set(t.id, t); return list; };
+const isAlbum = t => t.src === 'iaitem' || t.src === 'pl' || t.src === 'p2pitem';
+
+/* ---------- URLs / nomes ---------- */
+function streamUrl(t) {
+  if (t.url) return t.url;
+  if (t.src === 'audius') return apiBase() + '/v1/tracks/' + encodeURIComponent(t.rid) + '/stream?app_name=' + APP;
+  return IA + '/download/' + encodeURIComponent(t.item) + '/' + encPath(t.name);
+}
+function extOf(t) {
+  const s = (t.name || '') || String(t.url || '').split(/[?#]/)[0];
+  const m = s.match(/\.(mp3|m4a|aac|ogg|opus|wav|flac)$/i);
+  return m ? '.' + m[1].toLowerCase() : '.mp3';
+}
+function fileName(t) {
+  const a = t.artist || '', ti = t.title || 'musica';
+  const base = cfg.tpl === 'title' ? ti : cfg.tpl === 'title-artist' ? ti + ' - ' + a : a + ' - ' + ti;
+  return sanitize(base) + extOf(t);
+}
+
+/* ---------- navegação / filtros ---------- */
+const TAGS = ['', 'Pagode', 'Samba', 'Rap', 'Funk', 'Sertanejo', 'Forró', 'MPB', 'Bossa Nova', 'Axé', 'Choro', 'Gospel', 'Rock', 'Pop', 'Eletrônica', 'Hip-Hop', 'Lo-Fi', 'Jazz', 'Reggae', 'Metal', 'Soul', 'Clássica'];
+const SRCS = [['all','Todas'],['audius','Audius'],['ia','Acervo'],['ov','Openverse']];
+const ERAS = {
+  '':       { label: 'Todas as épocas',    range: '' },
+  'antiga': { label: 'Antigas (até 1979)', range: '[1000 TO 1979]' },
+  '80s90s': { label: 'Anos 80/90',         range: '[1980 TO 1999]' },
+  '2000s':  { label: 'Anos 2000',          range: '[2000 TO 2009]' },
+  'atual':  { label: 'Atuais (2010+)',     range: '[2010 TO 2026]' }
+};
+function paintSrcs() {
+  $('#srcs').innerHTML = '<span class="flab">Fonte</span>' + SRCS.map(([k, l]) =>
+    `<button class="chip ${state.srcf === k ? 'active' : ''}" data-s="${k}">${l}</button>`).join('');
+}
+function paintChips() {
+  $('#chips').innerHTML = '<span class="flab">Gênero</span>' + TAGS.map(g =>
+    `<button class="chip ${(state.genre || '') === g ? 'active' : ''}" data-g="${esc(g)}">${g || 'Todos'}</button>`).join('');
+}
+function paintEras() {
+  $('#eras').innerHTML = '<span class="flab">Época</span>' + Object.keys(ERAS).map(k =>
+    `<button class="chip ${state.era === k ? 'active' : ''}" data-e="${esc(k)}">${ERAS[k].label}</button>`).join('');
+}
+function syncNav() {
+  $$('#nav button').forEach(b => { const on = b.dataset.view === state.view; b.classList.toggle('active', on); b.setAttribute('aria-selected', on); });
+}
+$('#srcs').addEventListener('click', e => { const c = e.target.closest('[data-s]'); if (!c) return; state.srcf = c.dataset.s; paintSrcs(); route(); });
+$('#chips').addEventListener('click', e => {
+  const c = e.target.closest('[data-g]'); if (!c) return;
+  state.genre = c.dataset.g || ''; state.q = ''; qInput.value = ''; qClear.hidden = true;
+  state.era = ''; paintChips(); paintEras(); route();
+});
+$('#eras').addEventListener('click', e => { const c = e.target.closest('[data-e]'); if (!c) return; state.era = c.dataset.e || ''; paintEras(); route(); });
+$('#nav').addEventListener('click', e => {
+  const b = e.target.closest('[data-view]'); if (!b) return;
+  state.view = b.dataset.view; state.q = ''; state.genre = ''; state.era = ''; state.srcf = 'all';
+  qInput.value = ''; qClear.hidden = true; pqueue = null;
+  paintSrcs(); paintChips(); paintEras(); syncNav(); route();
+});
+$('#layoutbtn').onclick = () => {
+  state.layout = state.layout === 'list' ? 'grid' : 'list';
+  cfg.layout = state.layout; saveCfg();
+  if (['search', 'albums', 'favs'].includes(state.view)) paintGrid();
+  paintLayoutBtn();
+};
+function paintLayoutBtn() {
+  const b = $('#layoutbtn');
+  b.innerHTML = state.layout === 'list' ? I.grid : I.list;
+  b.title = state.layout === 'list' ? 'Ver em grade' : 'Ver em lista';
+}
+
+/* ---------- render: lista / grade ---------- */
+const srcLab = t => ({ audius:['Audius',''], pl:['Audius',''], ov:['Openverse','cc'], ia:['Acervo','alt'], iaitem:['Acervo','alt'], p2pitem:['P2P','p2p'], url:['Link','alt'] }[t.src] || ['Fonte','']);
+function rowHtml(t, D) {
+  const alb = isAlbum(t), [lab, cls] = srcLab(t), fav = !alb && isFav(t.id), dled = D.has(t.id);
+  const info = alb ? (t.src === 'pl' ? (t.total ? t.total + ' faixas' : 'coletânea') : (t.year ? String(t.year) : 'álbum')) : (t.license || (t.plays ? fmtN(t.plays) + ' plays' : ''));
+  const dur = !alb && t.duration ? fmtT(t.duration) : '';
+  const act = alb ? 'open' : 'play';
+  return `<div class="row ${cur && cur.id === t.id ? 'now' : ''}" data-id="${esc(t.id)}">
+    <button class="thumb" data-act="${act}" aria-label="${alb ? 'Abrir' : 'Tocar'} ${esc(t.title)}"><img src="${esc(t.art || PLACE)}" alt="" loading="lazy"><span class="pi">${alb ? I.disc : I.play}</span></button>
+    <div class="c-name"><b class="nm" data-act="${act}" title="${esc(t.title)}">${esc(t.title)}</b><span class="ar">${esc(t.artist)}${dled ? ' · <em class="dled">baixada</em>' : ''}</span></div>
+    <span class="c-src"><span class="tag ${cls}">${lab}</span></span>
+    <span class="c-info" title="${esc(info)}">${esc(info)}</span>
+    <span class="c-dur">${dur}</span>
+    <div class="c-act">${alb
+      ? `<button class="btn tonal sm" data-act="open">${I.music} Faixas</button>`
+      : `<button class="ib sm ${fav ? 'on' : ''}" data-act="fav" aria-label="Favoritar" title="Favoritar">${fav ? I.heartF : I.heart}</button>` +
+        (t.permalink ? `<a class="ib sm" href="${esc(t.permalink)}" target="_blank" rel="noopener" aria-label="Abrir fonte" title="Abrir fonte original">${I.ext}</a>` : '') +
+        `<button class="ib sm dlb" data-act="dl" aria-label="Baixar ${esc(t.title)}" title="Baixar">${I.dl}</button>`}</div>
+  </div>`;
+}
+function cardHtml(t, D) {
+  const alb = isAlbum(t), [lab, cls] = srcLab(t), fav = !alb && isFav(t.id), dled = D.has(t.id);
+  return `<article class="card" data-id="${esc(t.id)}">
+    <div class="cover"><img src="${esc(t.art || PLACE)}" alt="Capa de ${esc(t.title)}" loading="lazy"><span class="cp">${alb ? I.disc : I.play}</span>${!alb && t.duration ? `<span class="dur">${fmtT(t.duration)}</span>` : ''}</div>
+    <h3 class="t-title" title="${esc(t.title)}">${esc(t.title)}</h3>
+    <p class="t-artist">${esc(t.artist)}</p>
+    <div class="t-meta"><span class="tag ${cls}">${lab}</span>${t.license ? `<span>${esc(t.license)}</span>` : ''}${t.plays && !alb ? `<span>${fmtN(t.plays)} plays</span>` : ''}${dled ? '<span class="dled">baixada</span>' : ''}</div>
+    <div class="t-act">${alb
+      ? `<button class="btn tonal sm" data-act="open">${I.music} Faixas</button>`
+      : `<button class="btn tonal sm" data-act="dl">${I.dl} Baixar</button><button class="ib sm ${fav ? 'on' : ''}" data-act="fav" aria-label="Favoritar" title="Favoritar">${fav ? I.heartF : I.heart}</button>`}</div>
+  </article>`;
+}
+function listHtml(list, layout) {
+  if (!list.length) return '';
+  const D = dledIds(), lay = layout || state.layout;
+  if (lay === 'grid') return '<div class="grid">' + list.map(t => cardHtml(t, D)).join('') + '</div>';
+  return '<div class="list"><div class="lhead"><span></span><span>Arquivo</span><span>Fonte</span><span class="h-info">Info</span><span>Tempo</span><span></span></div>' + list.map(t => rowHtml(t, D)).join('') + '</div>';
+}
+function setLoading() {
+  const g = ++gen;
+  emptyBox.hidden = true;
+  view.innerHTML = '<div class="skels">' + '<div class="skel"></div>'.repeat(8) + '</div>';
+  return g;
+}
+function setTracks(list) { state.tracks = list; register(list); paintGrid(); }
+function paintGrid() {
+  const list = state.tracks;
+  emptyBox.hidden = list.length > 0;
+  view.innerHTML = listHtml(list);
+  if (!list.length) paintEmpty();
+}
+function paintEmpty(kind = 'none', extra = '') {
+  const cfgE = {
+    none:  { icon: I.music, h: 'Nada encontrado', p: 'Tente outra busca ou outro gênero. Não há faixas para ' + (state.q ? '“' + esc(state.q) + '”' : 'este filtro') + '.' },
+    favs:  { icon: I.heart, h: 'Nenhuma favorita ainda', p: 'Toque no coração em qualquer faixa para salvá-la aqui. Ficam guardadas neste navegador.' },
+    error: { icon: I.sad,   h: 'Não foi possível carregar', p: esc(extra || 'Verifique sua conexão e tente novamente.') }
+  }[kind];
+  emptyBox.innerHTML = `<div class="eico">${cfgE.icon}</div><h3>${cfgE.h}</h3><p>${cfgE.p}</p>` + (kind === 'error' ? '<button class="btn filled" id="empty-retry">Tentar novamente</button>' : '');
+  emptyBox.hidden = false;
+  const rb = $('#empty-retry'); if (rb) rb.onclick = () => route();
+}
+function head(title, sub, showLayout) {
+  $('#sec-title').textContent = title;
+  $('#sec-sub').textContent = sub;
+  $('#layoutbtn').hidden = !showLayout;
+}
+
+/* ---------- carregamentos ---------- */
+async function loadTrending() {
+  const g = setLoading();
+  try {
+    const gq = state.genre ? '&genre=' + encodeURIComponent(state.genre) : '';
+    const j = await api('/v1/tracks/trending?limit=40&time=week' + gq);
+    if (g !== gen) return;
+    setTracks((j.data || []).map(normA).filter(Boolean).filter(t => t.streamable));
+  } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Falha ao falar com a Audius: ' + (e && e.message)); }
+}
+async function searchAll(q) {
+  const g = setLoading(), f = state.srcf;
+  const pA = (f === 'all' || f === 'audius') ? (async () => {
+    try { const j = await api('/v1/tracks/search?query=' + encodeURIComponent(q) + '&limit=40', 16000); return (j.data || []).map(normA).filter(Boolean).filter(t => t.streamable); } catch { return []; }
+  })() : Promise.resolve([]);
+  const pI = (f === 'all' || f === 'ia') ? (async () => { try { return (await iaSearchDocs(iaQuery(q))).map(iaItem); } catch { return []; } })() : Promise.resolve([]);
+  const pO = (f === 'all' || f === 'ov') ? (async () => { try { return await ovSearch(q); } catch { return []; } })() : Promise.resolve([]);
+  const [a, i, o] = await Promise.all([pA, pI, pO]);
+  if (g !== gen) return;
+  setTracks([...a, ...i, ...o]);
+  const bits = [];
+  if (a.length) bits.push(a.length + ' faixas no Audius');
+  if (i.length) bits.push(i.length + ' álbuns no Acervo');
+  if (o.length) bits.push(o.length + ' faixas CC no Openverse');
+  $('#sec-sub').textContent = bits.join(' · ') || 'Nada encontrado — tente outro termo' + (state.era ? ' ou mude a época' : '');
+  if (!a.length && !i.length && !o.length) paintEmpty('error', 'Nada para “' + q + '” nas fontes selecionadas. Tente outro termo, outra fonte ou verifique a conexão.');
+}
+
+/* ---------- Internet Archive ---------- */
+async function iaSearchDocs(query) {
+  const url = IA + '/advancedsearch.php?q=' + encodeURIComponent(query) +
+    '&fl%5B%5D=identifier&fl%5B%5D=title&fl%5B%5D=creator&fl%5B%5D=year&sort%5B%5D=downloads+desc&rows=24&page=1&output=json';
+  const r = await fetchT(url, 16000);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const j = await r.json();
+  return (j.response && j.response.docs || []);
+}
+function iaItem(doc) {
+  const creator = Array.isArray(doc.creator) ? doc.creator.join(', ') : (doc.creator || '');
+  return { id: 'i-item:' + doc.identifier, src: 'iaitem', item: doc.identifier, title: doc.title || doc.identifier,
+    artist: creator || 'Artista desconhecido', art: IA + '/services/img/' + encodeURIComponent(doc.identifier), year: doc.year || '' };
+}
+function iaVariants(text, loose) {
+  const t0 = String(text || '').replace(/[+\-!(){}\[\]^"~*?:\\/]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!t0) return [];
+  const t1 = t0.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const out = [], push = v => { if (v && !out.includes(v)) out.push(v); };
+  push(t0.includes(' ') ? '"' + t0 + '"' : t0);
+  if (t1 !== t0.toLowerCase()) push(t1.includes(' ') ? '"' + t1 + '"' : t1);
+  if (loose) { const w = t1.split(' ').filter(x => x.length > 1); if (w.length > 1) push(w.join(' AND ')); }
+  return out;
+}
+function iaMatchClause(text, withSubject, loose) {
+  const vs = iaVariants(text, loose);
+  if (!vs.length) return '';
+  const fld = v => withSubject ? '(title:(' + v + ') OR creator:(' + v + ') OR subject:(' + v + '))' : '(title:(' + v + ') OR creator:(' + v + '))';
+  return ' AND (' + vs.map(fld).join(' OR ') + ')';
+}
+function iaQuery(text) {
+  let q = 'mediatype:(audio) AND format:(MP3)' + iaMatchClause(text, true, true);
+  if (state.era && ERAS[state.era].range) q += ' AND year:' + ERAS[state.era].range;
+  return q;
+}
+async function loadIA() {
+  const g = setLoading();
+  try {
+    const docs = await iaSearchDocs('mediatype:(audio) AND format:(MP3) AND collection:(audio_music OR netlabels)');
+    if (g !== gen) return;
+    setTracks(docs.map(iaItem));
+  } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Falha ao falar com o Internet Archive: ' + (e && e.message)); }
+}
+function iaAudioFiles(d, exts) {
+  let f = (d.files || []).filter(x => x.name && exts.test(x.name) && !/_64kb\.mp3$/i.test(x.name));
+  const mp3 = f.filter(x => /\.mp3$/i.test(x.name));
+  if (mp3.length) f = mp3;                       // evita listar original + derivados duplicados
+  return f.sort((a, b) => (parseInt(a.track) || 0) - (parseInt(b.track) || 0) || a.name.localeCompare(b.name, undefined, { numeric: true }));
+}
+function mkIATrack(item, f) {
+  const t = { id: 'i:' + item.item + '/' + f.name, src: 'ia', item: item.item, name: f.name,
+    title: (f.title || f.name.replace(/^.*\//, '').replace(/\.\w+$/, '')).replace(/_/g, ' '),
+    artist: item.artist, art: item.art, duration: 0, plays: 0, size: +f.size || 0 };
+  catalog.set(t.id, t);
+  return t;
+}
+
+/* ---------- álbuns ---------- */
+async function loadAlbums() {
+  const g = setLoading();
+  try {
+    const pP = api('/v1/playlists/trending?limit=12', 14000).then(j => (j.data || []).map(normPl).filter(Boolean)).catch(() => []);
+    const eraQ = state.era && ERAS[state.era].range ? ' AND year:' + ERAS[state.era].range : '';
+    const pI = iaSearchDocs('mediatype:(audio) AND format:(MP3) AND collection:(netlabels OR audio_music)' + eraQ).then(d => d.map(iaItem)).catch(() => []);
+    const [pls, ias] = await Promise.all([pP, pI]);
+    if (g !== gen) return;
+    setTracks([...pls, ...ias]);
+    $('#sec-sub').textContent = pls.length + ' coletâneas no Audius · ' + ias.length + ' álbuns livres no Internet Archive';
+    if (!pls.length && !ias.length) paintEmpty('error', 'Nenhum álbum encontrado agora — tente novamente em instantes.');
+  } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Falha ao carregar álbuns: ' + (e && e.message)); }
+}
+
+/* ---------- Openverse ---------- */
+const ovCache = new Map();
+async function ovSearch(q) {
+  const key = String(q || '').toLowerCase().trim();
+  if (ovCache.has(key)) return ovCache.get(key);
+  const r = await fetchT('https://api.openverse.org/v1/audio/?page_size=20&category=music&q=' + encodeURIComponent(key || 'brazil'), 15000);
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const j = await r.json();
+  const list = (j.results || []).map(normOv).filter(Boolean);
+  ovCache.set(key, list);
+  return list;
+}
+async function loadOV() {
+  const g = setLoading();
+  try {
+    const list = await ovSearch('');
+    if (g !== gen) return;
+    setTracks(list);
+    $('#sec-sub').textContent = list.length + ' faixas Creative Commons via Openverse (Jamendo, Wikimedia e mais)';
+  } catch (e) { if (g !== gen) return; state.tracks = []; view.innerHTML = ''; paintEmpty('error', 'Openverse indisponível (' + (e && e.message) + '). Ele limita requisições por minuto — espere um instante.'); }
+}
+
+/* ---------- modais ---------- */
+const modalOv = $('#modal-ov'), modal = $('#modal');
+let lastModalTracks = [];
+function openModal() {
+  modalOv.classList.add('open');
+  modalOv.onclick = e => { if (e.target === modalOv) closeModal(); };
+}
+function closeModal() { modalOv.classList.remove('open'); modal.innerHTML = ''; }
+const modalRow = (t, i, info) => `<div class="mrow">
+  <span class="mnum">${i + 1}</span>
+  <button class="ib sm" data-play="${esc(t.id)}" aria-label="Tocar ${esc(t.title)}">${I.play}</button>
+  <div class="mtt"><b title="${esc(t.title)}">${esc(t.title)}</b><span>${esc(t.artist)}${info ? ' · ' + esc(String(info)) : ''}</span></div>
+  <button class="ib sm dlb" data-dl="${esc(t.id)}" aria-label="Baixar ${esc(t.title)}" title="Baixar">${I.dl}</button>
+</div>`;
+modal.addEventListener('click', e => {
+  const p = e.target.closest('[data-play]'), d = e.target.closest('[data-dl]');
+  if (p) { const t = catalog.get(p.dataset.play); if (t) { pqueue = lastModalTracks.slice(); playTrack(t, lastModalTracks.slice()); } }
+  if (d) enqueueDl(d.dataset.dl);
+});
+function modalHead(item, sub, buttons) {
+  return `<div class="mhead"><img src="${esc(item.art || PLACE)}" alt=""><div class="mi"><b>${esc(item.title)}</b><span>${esc(sub)}</span></div>${buttons || ''}<button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>`;
+}
+async function openIAModal(item) {
+  const isPl = item.src === 'pl';
+  modal.innerHTML = modalHead(item, item.artist + ' · ' + (isPl ? 'coletânea Audius' : 'Internet Archive'),
+    '<button class="btn tonal sm" id="playall">Tocar tudo</button><button class="btn ghost sm" id="dlall">Baixar tudo</button>') +
+    '<div class="mlist"><div class="mload">Carregando faixas...</div></div>';
+  openModal();
+  $('#mclose').onclick = closeModal;
+  const list = modal.querySelector('.mlist');
+  const hideBtns = () => { $('#dlall').hidden = true; $('#playall').hidden = true; };
+  try {
+    let tracks;
+    if (isPl) {
+      const j = await api('/v1/playlists/' + encodeURIComponent(item.rid) + '/tracks?limit=100', 16000);
+      tracks = (j.data || []).map(normA).filter(Boolean).filter(t => t.streamable);
+      register(tracks);
+      if (tracks[0] && tracks[0].art && !item.art) {
+        item.art = tracks[0].art;
+        const mi = modal.querySelector('.mhead img'); if (mi) mi.src = item.art;
+      }
+      if (!tracks.length) { list.innerHTML = '<div class="mempty">Coletânea vazia ou indisponível.</div>'; hideBtns(); return; }
+      list.innerHTML = tracks.map((t, i) => modalRow(t, i, fmtT(t.duration))).join('');
+    } else {
+      const r = await fetchT(IA + '/metadata/' + encodeURIComponent(item.item), 16000);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      const files = iaAudioFiles(d, /\.mp3$/i);
+      if (!files.length) { list.innerHTML = '<div class="mempty">Nenhum arquivo MP3 disponível neste item.</div>'; hideBtns(); return; }
+      tracks = files.map(f => mkIATrack(item, f));
+      list.innerHTML = tracks.map((t, i) => modalRow(t, i, t.size ? fmtMB(t.size) : '')).join('');
+    }
+    lastModalTracks = tracks;
+    $('#playall').onclick = () => { closeModal(); playTrack(tracks[0], tracks.slice()); toast('Tocando “' + item.title + '” — ' + tracks.length + ' faixas na fila'); };
+    $('#dlall').onclick = () => { tracks.slice(0, 20).forEach(t => enqueueDl(t.id, true)); toast(Math.min(20, tracks.length) + ' faixas na fila' + (tracks.length > 20 ? ' (primeiras 20)' : '')); };
+  } catch (e) { list.innerHTML = '<div class="mempty">Erro ao carregar as faixas. Feche e tente de novo.</div>'; }
+}
+
+/* ---------- favoritos ---------- */
+function toggleFav(t) {
+  if (!t || t.src === 'p2p' || isAlbum(t)) { toast('Este item não pode ser favoritado'); return; }
+  let f = getFavs();
+  if (isFav(t.id)) { f = f.filter(x => x.id !== t.id); toast('Removida das favoritas'); }
+  else {
+    f.unshift({ id: t.id, src: t.src, rid: t.rid, item: t.item, name: t.name, title: t.title, artist: t.artist, duration: t.duration, art: t.art, plays: t.plays, genre: t.genre, permalink: t.permalink, url: t.url, license: t.license, size: t.size });
+    toast('Salva nas favoritas', 'ok');
+  }
+  lsSet('mt_favs', f);
+  refreshFavUI();
+}
+function refreshFavUI() {
+  $$('[data-id]').forEach(c => {
+    const b = c.querySelector('[data-act="fav"]');
+    if (b) { const on = isFav(c.dataset.id); b.classList.toggle('on', on); b.innerHTML = on ? I.heartF : I.heart; }
+  });
+  paintNpFav();
+  if (state.view === 'favs') { state.tracks = getFavs(); register(state.tracks); paintGrid(); if (!state.tracks.length) paintEmpty('favs'); }
+}
+
+/* ---------- player ---------- */
+function playTrack(t, list) {
+  if (!t) return;
+  if (t.src === 'p2pitem') { openP2PItemModal(t); return; }
+  if (t.src === 'iaitem' || t.src === 'pl') { openIAModal(t); return; }
+  if (Array.isArray(list) && list.length) pqueue = list.slice();
+  cur = t; errStreak = 0;
+  audio.src = streamUrl(t);
+  audio.play().catch(() => toast('Toque novamente para iniciar o áudio'));
+  paintNp(t);
+  try { mediaSession(t); } catch {}
+  document.title = 'Tocando: ' + t.title + ' — MusiTop';
+  $$('.row.now').forEach(r => r.classList.remove('now'));
+  $$('.row[data-id="' + CSS.escape(t.id) + '"]').forEach(r => r.classList.add('now'));
+}
+function paintNp(t) {
+  $('#np-title').textContent = t.title;
+  $('#np-artist').textContent = t.artist;
+  $('#np-art').innerHTML = t.art ? `<img src="${esc(t.art)}" alt="">` : I.music;
+  paintNpFav();
+}
+function paintNpFav() {
+  const b = $('#np-fav'); if (!b) return;
+  const on = !!(cur && isFav(cur.id));
+  b.classList.toggle('on', on);
+  b.innerHTML = on ? I.heartF : I.heart;
+}
+function mediaSession(t) {
+  if (!('mediaSession' in navigator)) return;
+  navigator.mediaSession.metadata = new MediaMetadata({ title: t.title, artist: t.artist, album: 'MusiTop', artwork: t.art ? [{ src: t.art, sizes: '480x480' }] : [] });
+  navigator.mediaSession.setActionHandler('play', () => audio.play());
+  navigator.mediaSession.setActionHandler('pause', () => audio.pause());
+  navigator.mediaSession.setActionHandler('previoustrack', () => step(-1));
+  navigator.mediaSession.setActionHandler('nexttrack', () => step(1));
+}
+function step(dir, auto) {
+  if (!cur || cur.src === 'p2p') return;          // faixas P2P avulsas não têm fila
+  const base = (pqueue && pqueue.length) ? pqueue : state.tracks;
+  const list = base.filter(t => !isAlbum(t) && t.src !== 'p2p');
+  if (!list.length) return;
+  const i = list.findIndex(x => x.id === cur.id);
+  let n;
+  if (shuffle && list.length > 1) { do { n = Math.floor(Math.random() * list.length); } while (n === i); }
+  else {
+    n = i < 0 ? 0 : i + dir;
+    if (n >= list.length) { if (auto && repeat !== 'all') return; n = 0; }   // fim da fila: para, a menos que "repetir tudo"
+    if (n < 0) n = list.length - 1;
+  }
+  playTrack(list[n]);
+}
+const firstPlayable = () => state.tracks.find(t => !isAlbum(t) && t.src !== 'p2p');
+$('#btn-play').onclick = () => {
+  if (!cur) { pqueue = null; const f = firstPlayable(); if (f) playTrack(f); else toast('Escolha uma faixa primeiro'); return; }
+  if (audio.paused) audio.play().catch(() => {}); else audio.pause();
+};
+$('#btn-next').onclick = () => step(1);
+$('#btn-prev').onclick = () => { if (audio.currentTime > 4) { audio.currentTime = 0; return; } step(-1); };
+$('#btn-shuffle').onclick = e => { shuffle = !shuffle; e.currentTarget.classList.toggle('on', shuffle); toast(shuffle ? 'Aleatório ativado' : 'Aleatório desativado'); };
+$('#btn-repeat').onclick = e => {
+  repeat = repeat === 'off' ? 'all' : repeat === 'all' ? 'one' : 'off';
+  e.currentTarget.classList.toggle('on', repeat !== 'off');
+  e.currentTarget.style.color = repeat === 'one' ? 'var(--warn)' : '';
+  toast(repeat === 'off' ? 'Repetição desativada' : repeat === 'all' ? 'Repetir tudo' : 'Repetir esta faixa');
+};
+$('#np-fav').onclick = () => { if (cur) toggleFav(cur); };
+$('#np-dl').onclick = () => {
+  if (!cur) return;
+  if (cur.src === 'p2p') { toast('Faixa P2P: use o botão de baixar na lista do torrent'); return; }
+  enqueueDl(cur.id);
+};
+audio.addEventListener('play',  () => { player.classList.add('playing'); $('#ic-play').style.display = 'none'; $('#ic-pause').style.display = ''; });
+audio.addEventListener('pause', () => { player.classList.remove('playing'); $('#ic-play').style.display = ''; $('#ic-pause').style.display = 'none'; });
+audio.addEventListener('playing', () => { errStreak = 0; });
+audio.addEventListener('timeupdate', () => {
+  if (!audio.duration || !isFinite(audio.duration)) return;
+  const p = audio.currentTime / audio.duration * 100;
+  $('#seek').value = Math.round(p * 10);
+  $('#seek').style.setProperty('--fill', p + '%');
+  $('#t-cur').textContent = fmtT(audio.currentTime);
+});
+audio.addEventListener('loadedmetadata', () => { $('#t-dur').textContent = fmtT(audio.duration); });
+audio.addEventListener('ended', () => {
+  if (repeat === 'one') { audio.currentTime = 0; audio.play().catch(() => {}); return; }
+  step(1, true);
+});
+audio.addEventListener('error', () => {
+  if (!cur || !audio.getAttribute('src')) return;
+  errStreak++;
+  toast('Não foi possível tocar esta faixa' + (cur.src !== 'p2p' && errStreak <= 3 ? ', pulando...' : '.'), 'err');
+  if (cur.src !== 'p2p' && errStreak <= 3) setTimeout(() => step(1, true), 600);
+});
+$('#seek').addEventListener('input', e => { if (audio.duration && isFinite(audio.duration)) audio.currentTime = e.target.value / 1000 * audio.duration; });
+$('#vol').addEventListener('input', e => { audio.volume = e.target.value / 100; });
+audio.volume = .9;
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal(); return; }
+  const tag = (e.target.tagName || '').toLowerCase();
+  if (['input', 'textarea', 'select', 'button', 'a'].includes(tag) || e.target.isContentEditable) return;
+  if (e.code === 'Space') { e.preventDefault(); $('#btn-play').click(); }
+  else if (e.code === 'ArrowRight' && audio.duration) audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+  else if (e.code === 'ArrowLeft' && audio.duration) audio.currentTime = Math.max(0, audio.currentTime - 10);
+});
+
+/* ---------- downloads (fila + log estilo yt-dlp) ---------- */
+const dls = new Map();
+let dlq = [], active = 0;
+const logs = [];
+function logLine(text, cls, key) {
+  if (key) for (let i = logs.length - 1; i >= Math.max(0, logs.length - 40); i--) if (logs[i].key === key) { logs[i].text = text; return; }
+  logs.push({ text, cls: cls || '', key: key || null });
+  if (logs.length > 400) logs.splice(0, logs.length - 400);
+}
+function updateBadge() {
+  const n = [...dls.values()].filter(d => d.status === 'fila' || d.status === 'baixando').length;
+  const b = $('#nbadge'); b.hidden = n === 0; b.textContent = n > 9 ? '9+' : n;
+}
+function enqueueDl(id, quiet) {
+  const t = catalog.get(id);
+  if (!t) { toast('Faixa indisponível para baixar', 'err'); return; }
+  const ex = dls.get(id);
+  if (ex && (ex.status === 'fila' || ex.status === 'baixando')) { if (!quiet) toast('Já está na fila'); return; }
+  dls.set(id, { id, t, status: 'fila', pct: 0, got: 0, total: t.size || 0, speed: 0, eta: 0, err: '', note: '', ctl: null });
+  dlq.push(id);
+  logLine('[info] ' + t.title + ': adicionado à fila', 'i');
+  if (!quiet) toast('Na fila: ' + t.title);
+  updateBadge(); paintXfers(); pump();
+}
+function pump() {
+  while (active < cfg.conc && dlq.length) {
+    const id = dlq.shift(), d = dls.get(id);
+    if (!d || d.status !== 'fila') continue;
+    active++;
+    runDl(d).finally(() => { active--; pump(); });
+  }
+}
+function openDirect(url, name) {
+  const a = document.createElement('a');
+  a.href = url; a.download = name; a.target = '_blank'; a.rel = 'noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function progLine(d) {
+  return d.total
+    ? '[download] ' + (d.pct * 100).toFixed(1).padStart(5) + '% of ' + mib(d.total) + ' at ' + fmtSp(d.speed) + ' ETA ' + fmtETA(d.eta)
+    : '[download] ' + mib(d.got) + ' at ' + fmtSp(d.speed);
+}
+async function runDl(d) {
+  d.status = 'baixando'; d.ctl = new AbortController();
+  const t0 = performance.now(), name = fileName(d.t), url = streamUrl(d.t), key = 'p' + d.id;
+  logLine('[info] ' + d.id + ': Downloading 1 format(s): original', 'i');
+  logLine('[download] Destination: ' + name, 'd');
+  paintXfers();
+  try {
+    const to = setTimeout(() => d.ctl.abort(), 45000);
+    let r;
+    try { r = await fetch(url, { cache: 'no-store', signal: d.ctl.signal }); } finally { clearTimeout(to); }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    d.total = +r.headers.get('content-length') || d.t.size || 0;
+    const rd = r.body.getReader(), chunks = [];
+    let got = 0, lastGot = 0, lastT = performance.now();
+    for (;;) {
+      const { done, value } = await rd.read();
+      if (done) break;
+      chunks.push(value); got += value.length; d.got = got;
+      if (d.total) d.pct = Math.min(1, got / d.total);
+      const now = performance.now();
+      if (now - lastT > 500) {
+        d.speed = (got - lastGot) / ((now - lastT) / 1000); lastGot = got; lastT = now;
+        d.eta = d.total && d.speed ? (d.total - got) / d.speed : 0;
+        logLine(progLine(d), 'd', key); paintXfers();
+      }
+    }
+    const type = (r.headers.get('content-type') || 'audio/mpeg').split(';')[0];
+    saveBlob(new Blob(chunks, { type }), name);
+    d.status = 'ok'; d.pct = 1; d.speed = 0; d.total = d.total || got;
+    logLine('[download] 100% of ' + mib(got) + ' in ' + fmtETA((performance.now() - t0) / 1000), 'd', key);
+    logLine('[info] Salvo: ' + name, 'i');
+    markDled(d.t.id); toast('Baixado: ' + name, 'ok'); refreshDledBadges();
+  } catch (e) {
+    if (d.status === 'cancelado') { logLine('[info] ' + d.id + ': cancelado', 'w'); }
+    else if (e && e.name === 'TypeError') {
+      /* CORS/rede: o servidor não permite fetch — entrega o download ao próprio navegador */
+      logLine('[warn] ' + d.id + ': fetch bloqueado (CORS/rede) — abrindo pelo navegador', 'w');
+      openDirect(url, name);
+      d.status = 'ok'; d.pct = 1; d.note = 'aberto no navegador';
+      markDled(d.t.id);
+    } else {
+      d.status = 'erro';
+      d.err = e && e.name === 'AbortError' ? 'tempo esgotado' : ((e && e.message) || 'falha');
+      logLine('ERROR: ' + d.id + ': ' + d.err, 'e');
+      toast('Erro ao baixar “' + d.t.title + '”: ' + d.err, 'err');
+    }
+  }
+  d.ctl = null; updateBadge(); paintXfers();
+}
+function saveBlob(blob, name) {
+  const a = document.createElement('a'), u = URL.createObjectURL(blob);
+  a.href = u; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(u), 40000);
+}
+function refreshDledBadges() {
+  const D = dledIds();
+  $$('.row[data-id]').forEach(r => {
+    if (!D.has(r.dataset.id)) return;
+    const ar = r.querySelector('.ar');
+    if (ar && !ar.querySelector('.dled')) ar.insertAdjacentHTML('beforeend', ' · <em class="dled">baixada</em>');
+  });
+}
+
+/* ---------- tela de transferências ---------- */
+function xrowHtml(d) {
+  const st = { fila:'Na fila', baixando: d.total ? Math.round(d.pct * 100) + '%' : 'Baixando', ok:'Concluído', erro:'Falhou', cancelado:'Cancelado' }[d.status];
+  const sub = d.status === 'erro' ? d.err : d.status === 'baixando' ? (d.total ? mib(d.got) + ' / ' + mib(d.total) : mib(d.got)) : d.status === 'ok' ? (mib(d.total || d.got) + (d.note ? ' · ' + d.note : '')) : d.t.artist;
+  const act = (d.status === 'fila' || d.status === 'baixando') ? `<button class="ib sm" data-xcancel="${esc(d.id)}" title="Cancelar" aria-label="Cancelar">${I.x}</button>` :
+    `${d.status !== 'ok' ? `<button class="ib sm" data-xretry="${esc(d.id)}" title="Tentar novamente" aria-label="Tentar novamente">${I.retry}</button>` : ''}<button class="ib sm" data-xrm="${esc(d.id)}" title="Remover da lista" aria-label="Remover">${I.x}</button>`;
+  return `<div class="xrow ${d.status}">
+    <img src="${esc(d.t.art || PLACE)}" alt="">
+    <div class="xmain"><b title="${esc(d.t.title)}">${esc(d.t.title)}</b><span>${esc(sub)}</span><div class="bar"><i style="width:${((d.status === 'ok' ? 1 : d.pct) * 100).toFixed(1)}%"></i></div></div>
+    <span class="xst">${st}</span><span class="xsp">${d.status === 'baixando' ? fmtSp(d.speed) : '—'}</span><span class="xeta">${d.status === 'baixando' ? fmtETA(d.eta) : '—'}</span>
+    <div class="c-act">${act}</div></div>`;
+}
+function renderTransfers() {
+  head('Transferências', 'Fila de downloads, torrents e log no estilo yt-dlp', false);
+  view.innerHTML = `<div class="tbar">
+      <button class="btn tonal sm" id="x-clear">Limpar concluídos</button>
+      <button class="btn ghost sm" id="x-cancel">Cancelar todos</button></div>
+    <div id="xlist"></div>
+    <h4 class="sub-h" id="xtorshd" hidden>Torrents (P2P)</h4><div id="xtors"></div>
+    <h4 class="sub-h">${I.term.replace('<svg', '<svg width="15" height="15" style="vertical-align:-2px;margin-right:6px"')}Log</h4>
+    <div class="console" id="xlog" aria-label="Log de downloads"></div>
+    <div class="tbar" style="margin-top:10px"><button class="btn ghost sm" id="x-clearlog">Limpar log</button></div>`;
+  $('#x-clear').onclick = () => { for (const [id, d] of [...dls]) if (d.status === 'ok' || d.status === 'erro' || d.status === 'cancelado') dls.delete(id); paintXfers(); };
+  $('#x-cancel').onclick = () => { for (const d of dls.values()) if (d.status === 'fila' || d.status === 'baixando') cancelDl(d.id); };
+  $('#x-clearlog').onclick = () => { logs.length = 0; paintXfers(); };
+  paintXfers();
+}
+function paintXfers() {
+  updateBadge();
+  if (state.view !== 'transfers') return;
+  const box = $('#xlist'); if (!box) return;
+  const arr = [...dls.values()].reverse();
+  box.innerHTML = arr.length
+    ? '<div class="xlist"><div class="xhead"><span></span><span>Arquivo</span><span>Status</span><span class="h-sp">Velocidade</span><span>ETA</span><span></span></div>' + arr.map(xrowHtml).join('') + '</div>'
+    : '<div class="xlist"><div class="xempty">Nenhuma transferência ainda.<br>Use <b>Baixar</b> em qualquer faixa — o progresso aparece aqui.</div></div>';
+  const tors = [...p2pItems.values()];
+  $('#xtorshd').hidden = !tors.length;
+  $('#xtors').innerHTML = tors.map(p2pCard).join('');
+  const lg = $('#xlog');
+  const stick = lg.scrollTop + lg.clientHeight >= lg.scrollHeight - 30;
+  lg.innerHTML = logs.length ? logs.map(l => `<div class="${l.cls}">${esc(l.text)}</div>`).join('') : '<div>[info] aguardando downloads...</div>';
+  if (stick) lg.scrollTop = lg.scrollHeight;
+}
+function cancelDl(id) {
+  const d = dls.get(id); if (!d) return;
+  d.status = 'cancelado';
+  if (d.ctl) d.ctl.abort();
+  dlq = dlq.filter(x => x !== id);
+  updateBadge(); paintXfers();
+}
+document.addEventListener('click', e => {
+  const c = e.target.closest('[data-xcancel]'), r = e.target.closest('[data-xretry]'), m = e.target.closest('[data-xrm]');
+  if (c) cancelDl(c.dataset.xcancel);
+  if (r) { const d = dls.get(r.dataset.xretry); if (d) { d.status = 'fila'; d.pct = 0; d.got = 0; d.err = ''; dlq.push(d.id); paintXfers(); pump(); } }
+  if (m) { dls.delete(m.dataset.xrm); paintXfers(); }
+});
+window.addEventListener('beforeunload', e => {
+  const dlAtivo = [...dls.values()].some(d => d.status === 'baixando' || d.status === 'fila');
+  const p2pAtivo = [...p2pItems.values()].some(it => it.torrent.progress < 1);
+  if (dlAtivo || p2pAtivo) { e.preventDefault(); e.returnValue = ''; }
+});
+
+/* ---------- aba Link (estilo yt-dlp / Seal) ---------- */
+const AUDIO_EXT = /\.(mp3|m4a|aac|ogg|opus|wav|flac)(\?|#|$)/i;
+function renderLink() {
+  head('Colar link', 'Cole o endereço e baixe — o MusiTop identifica a fonte sozinho', false);
+  view.innerHTML = `<div class="panel">
+      <h3>${I.link} Link da música, álbum ou perfil</h3>
+      <form class="frm big" id="linkform">
+        <input id="linkin" type="url" inputmode="url" placeholder="https://audius.co/... · https://archive.org/details/... · link direto .mp3 · magnet:..." autocomplete="off" spellcheck="false" aria-label="Link">
+        <button class="btn ghost" type="button" id="pastebtn">${I.paste} Colar</button>
+        <button class="btn filled" type="submit">Analisar</button>
+      </form>
+      <div class="suprow"><span class="tag">Audius</span><span class="tag alt">Internet Archive</span><span class="tag alt">Link direto de áudio</span><span class="tag p2p">Magnet / .torrent</span><span class="tag">YouTube: só ouvir</span></div>
+      <p class="hint">O arquivo é baixado no <b>formato original</b> da fonte (sem conversão — o navegador não roda ffmpeg). Playlists e álbuns mostram a lista de faixas com <b>Baixar tudo</b>.</p>
+    </div><div id="linkres"></div>`;
+  const inp = $('#linkin');
+  if (/^(https?:|magnet:)/i.test(state.q)) inp.value = state.q;
+  $('#linkform').onsubmit = e => { e.preventDefault(); resolveLink(inp.value); };
+  $('#pastebtn').onclick = async () => {
+    try { const t = await navigator.clipboard.readText(); if (t) { inp.value = t.trim(); resolveLink(inp.value); } else toast('Área de transferência vazia'); }
+    catch { toast('Sem permissão para colar — use Ctrl+V no campo', 'err'); }
+  };
+}
+const linkLoading = '<div class="panel"><div class="mload">Analisando link...</div></div>';
+function showLinkTracks(box, title, sub, art, tracks) {
+  register(tracks);
+  state.tracks = tracks; pqueue = null;
+  const n = tracks.length;
+  box.innerHTML = `<div class="panel linkcard">
+      <img src="${esc(art || (tracks[0] && tracks[0].art) || PLACE)}" alt="">
+      <div class="lc-i"><b>${esc(title)}</b><span class="s">${esc(sub)}</span><div class="suprow"><span class="tag ok">${n} faixa${n > 1 ? 's' : ''}</span><span class="tag">formato original</span></div></div>
+      <div class="lc-a"><button class="btn tonal" id="lk-play">${I.play} Ouvir</button><button class="btn filled" id="lk-dl">${I.dl} Baixar${n > 1 ? ' tudo' : ''}</button></div>
+    </div>` + (n ? listHtml(tracks, 'list') : '');
+  $('#lk-play').onclick = () => { if (tracks[0]) { pqueue = tracks.slice(); playTrack(tracks[0], tracks.slice()); } };
+  $('#lk-dl').onclick = () => { const L = tracks.slice(0, 50); L.forEach(t => enqueueDl(t.id, true)); toast(L.length + ' faixa(s) na fila' + (n > 50 ? ' (primeiras 50)' : '')); };
+}
+async function resolveLink(raw) {
+  const url = String(raw || '').trim(), box = $('#linkres');
+  if (!box || !url) return;
+  const g = ++gen;
+  if (/^magnet:/i.test(url) || /\.torrent(\?|#|$)/i.test(url)) {
+    state.view = 'p2p'; state.q = ''; syncNav(); route(); addP2P(url); return;
+  }
+  const yid = /youtu/i.test(url) ? ytId(url) : null;
+  if (yid) {
+    box.innerHTML = `<div class="panel"><p class="note"><b>YouTube:</b> o download de lá não é permitido pelos termos do YouTube, então aqui só dá para <b>ouvir</b> (embed oficial). Para baixar, busque a faixa nas outras fontes.</p>
+      ${ytEmbed(yid)}</div>`;
+    return;
+  }
+  box.innerHTML = linkLoading;
+  try {
+    if (/^https?:\/\/(www\.)?audius\.co\//i.test(url)) {
+      const j = await api('/v1/resolve?url=' + encodeURIComponent(url), 16000);
+      let d = j.data; if (Array.isArray(d)) d = d[0];
+      if (!d) throw new Error('link do Audius não reconhecido');
+      if (g !== gen) return;
+      if (d.playlist_name) {
+        const pl = normPl(d), jt = await api('/v1/playlists/' + encodeURIComponent(d.id) + '/tracks?limit=100', 16000);
+        const tr = (jt.data || []).map(normA).filter(Boolean).filter(t => t.streamable);
+        if (g !== gen) return;
+        showLinkTracks(box, pl.title, 'Coletânea de ' + pl.artist + ' · Audius', pl.art, tr);
+      } else if (d.title) {
+        const t = normA(d); if (!t) throw new Error('faixa indisponível');
+        showLinkTracks(box, t.title, t.artist + ' · Audius', t.art, [t]);
+      } else if (d.handle) {
+        const jt = await api('/v1/users/' + encodeURIComponent(d.id) + '/tracks?limit=50', 16000);
+        const tr = (jt.data || []).map(normA).filter(Boolean).filter(t => t.streamable);
+        if (g !== gen) return;
+        const art = d.profile_picture && (d.profile_picture['480x480'] || d.profile_picture['150x150']);
+        showLinkTracks(box, d.name || d.handle, 'Perfil no Audius · faixas recentes', art, tr);
+      } else throw new Error('tipo de link do Audius não suportado');
+      return;
+    }
+    const mIA = url.match(/^https?:\/\/(?:www\.)?archive\.org\/(?:details|download|embed)\/([^\/?#]+)/i);
+    if (mIA) {
+      const id = decodeURIComponent(mIA[1]);
+      const r = await fetchT(IA + '/metadata/' + encodeURIComponent(id), 16000);
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      if (!d.metadata) throw new Error('item não encontrado no Internet Archive');
+      const m = d.metadata, creator = Array.isArray(m.creator) ? m.creator.join(', ') : (m.creator || 'Artista desconhecido');
+      const item = { item: id, artist: creator, art: IA + '/services/img/' + encodeURIComponent(id) };
+      const files = iaAudioFiles(d, /\.(mp3|m4a|ogg|flac)$/i);
+      if (g !== gen) return;
+      if (!files.length) throw new Error('nenhum arquivo de áudio neste item');
+      showLinkTracks(box, Array.isArray(m.title) ? m.title[0] : (m.title || id), creator + ' · Internet Archive', item.art, files.map(f => mkIATrack(item, f)));
+      return;
+    }
+    if (/^https?:\/\//i.test(url) && AUDIO_EXT.test(url)) {
+      const fname = decodeURIComponent(url.split(/[?#]/)[0].split('/').pop() || 'audio');
+      let host = ''; try { host = new URL(url).hostname; } catch {}
+      const t = { id: 'u:' + url, src: 'url', url, name: fname, title: fname.replace(/\.\w+$/, '').replace(/[_]+/g, ' '), artist: host || 'Link direto', art: '', duration: 0, plays: 0 };
+      showLinkTracks(box, t.title, 'Arquivo de áudio · ' + host, '', [t]);
+      return;
+    }
+    throw new Error('fonte não suportada. Aceito: Audius, Internet Archive, link direto de áudio, magnet/.torrent');
+  } catch (e) {
+    if (g !== gen) return;
+    box.innerHTML = `<div class="panel"><p class="note err">Não consegui analisar este link: ${esc((e && e.message) || 'erro')}.</p></div>`;
+  }
+}
+
+/* ---------- P2P via WebTorrent ---------- */
+const p2pItems = new Map(), p2pFiles = new Map();
+let wtClient = null, wtLoading = null, p2pBusy = false, playGen = 0;
+function loadWebTorrent() {
+  if (window.WebTorrent) return Promise.resolve();
+  if (wtLoading) return wtLoading;
+  wtLoading = (async () => {
+    try {
+      await new Promise((res, rej) => {
+        const s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/webtorrent@1.9.7/webtorrent.min.js';
+        s.onload = () => res(); s.onerror = () => rej(new Error('cdn 1.x falhou'));
+        document.head.appendChild(s);
+      });
+    } catch (e) {}
+    if (!window.WebTorrent) {
+      try { const m = await import('https://cdn.jsdelivr.net/npm/webtorrent@2/dist/webtorrent.min.js'); if (m && m.default) window.WebTorrent = m.default; } catch (e) {}
+    }
+    if (!window.WebTorrent) throw new Error('WebTorrent não disponível (sem internet?)');
+  })();
+  wtLoading.catch(() => { wtLoading = null; });
+  return wtLoading;
+}
+function p2pClient() {
+  if (!wtClient) { wtClient = new window.WebTorrent(); wtClient.on('error', e => console.warn('[p2p]', e && e.message)); }
+  return wtClient;
+}
+function addViaClient(client, src, ms = 60000) {
+  return new Promise((res, rej) => {
+    let done = false, t;
+    const fin = (f, v) => { if (done) return; done = true; clearTimeout(tm); f(v); };
+    const tm = setTimeout(() => { try { if (t) client.remove(t); } catch {} fin(rej, new Error('tempo esgotado esperando o torrent (sem peers/webseed)')); }, ms);
+    try { t = client.add(src, tor => fin(res, tor)); } catch (e) { fin(rej, e); return; }
+    t.on('error', e => fin(rej, e));
+  });
+}
+async function blobUrlOf(f) {
+  if (typeof f.blob === 'function') return URL.createObjectURL(await f.blob());
+  return new Promise((res, rej) => { try { f.getBlobURL((e, u) => e ? rej(e) : res(u)); } catch (e) { rej(e); } });
+}
+const p2pSayer = hint => (m, err) => { if (hint) { hint.hidden = !m; hint.innerHTML = m; hint.classList.toggle('err', !!err); } };
+async function addP2P(raw) {
+  if (!raw) return;
+  if (p2pBusy) { toast('Aguarde — já estou adicionando um torrent'); return; }
+  p2pBusy = true;
+  const say = p2pSayer($('#p2phint'));
+  try {
+    if (typeof raw === 'object' && raw.name) {
+      say('Lendo arquivo .torrent...');
+      await loadWebTorrent();
+      registerP2PTorrent(await addViaClient(p2pClient(), raw), say);
+      return;
+    }
+    const src = String(raw).trim();
+    if (!src) return;
+    const isMagnet = /^magnet:/i.test(src), isUrl = /^https?:/i.test(src);
+    const looksId = !isMagnet && !isUrl && !/\s/.test(src) && /^[A-Za-z0-9._-]{6,}$/.test(src);
+    if (!isMagnet && !isUrl && !looksId) { say('“' + esc(src) + '” parece busca, não um magnet — procurando álbuns...'); fillP2PSearch(src); return; }
+    if (looksId) {
+      say('Verificando o item no Internet Archive...');
+      let ok = false;
+      try {
+        const r = await fetchT(IA + '/metadata/' + encodeURIComponent(src) + '/files', 15000);
+        if (r.ok) { const dj = await r.json(); ok = ((dj && dj.result) || []).some(f => f.name === src + '_archive.torrent'); }
+      } catch (e) {}
+      if (ok) { await addIATorrent({ item: src }, say); return; }
+      say('“' + esc(src) + '” não é um identificador do Archive — procurando álbuns...');
+      fillP2PSearch(src);
+      return;
+    }
+    say('Buscando informações do torrent (até 60 s)...');
+    await loadWebTorrent();
+    registerP2PTorrent(await addViaClient(p2pClient(), src), say);
+  } catch (e) {
+    say('Não consegui adicionar: ' + esc((e && e.message) || 'erro desconhecido') + '.<br>Para álbuns, use a <b>busca</b> acima — ela acha e adiciona com 1 clique.', true);
+    logLine('ERROR: p2p: ' + ((e && e.message) || 'erro'), 'e');
+  } finally { p2pBusy = false; }
+}
+function registerP2PTorrent(torrent, say) {
+  const id = 't' + (torrent.infoHash || Date.now().toString(36));
+  if (p2pItems.has(id)) { if (say) say('Este torrent já está na lista.'); return; }
+  const it = { id, torrent, files: [], name: torrent.name || 'Torrent' };
+  p2pItems.set(id, it);
+  harvestP2PFiles(it);
+  if (say) say('');
+  logLine('[info] p2p: torrent adicionado — ' + it.name, 'i');
+  toast('Torrent adicionado: ' + it.name, 'ok');
+  torrent.on('done', () => { toast('Download P2P concluído: ' + it.name, 'ok'); logLine('[info] p2p: concluído — ' + it.name, 'd'); });
+  refreshP2PList();
+}
+function harvestP2PFiles(it) {
+  for (const pf of it.files) p2pFiles.delete(pf.id);
+  it.files = (it.torrent.files || []).filter(f => /\.(mp3|m4a|ogg|opus|wav|flac)$/i.test(f.name)).slice(0, 60).map((f, i) => {
+    const pf = { id: it.id + ':' + i, torrent: it.torrent, file: f, name: f.name, size: f.length };
+    p2pFiles.set(pf.id, pf);
+    return pf;
+  });
+}
+function removeP2P(id) {
+  const it = p2pItems.get(id); if (!it) return;
+  try { if (wtClient) wtClient.remove(it.torrent); } catch {}
+  for (const pf of it.files) p2pFiles.delete(pf.id);
+  p2pItems.delete(id);
+  refreshP2PList(); paintXfers();
+}
+function npFromP2P(pf) {
+  pqueue = null;
+  cur = { id: 'p2p:' + pf.id, src: 'p2p', title: pf.name.replace(/^.*\//, '').replace(/\.\w+$/, '').replace(/_/g, ' '), artist: (pf.torrent.name || 'Torrent P2P') + ' · P2P', art: '', duration: 0, plays: 0 };
+  paintNp(cur);
+  document.title = 'Tocando: ' + cur.title + ' — MusiTop';
+}
+const webseedBase = (pf, httpsOnly) => (pf.torrent.urlList || []).map(u => String(u).replace(/^http:/i, 'https:')).find(u => /^https:/i.test(u) || (!httpsOnly && /^http:/i.test(u)));
+async function playP2P(pf) {
+  const g = ++playGen;
+  try {
+    const base = webseedBase(pf, true);
+    if (base) {
+      npFromP2P(pf);
+      audio.src = (base.endsWith('/') ? base : base + '/') + encPath(pf.file.path);
+      audio.play().catch(() => {});
+      toast('Tocando do webseed — o download P2P segue em 2º plano', 'ok');
+      return;
+    }
+    toast('P2P: preparando “' + pf.name + '”...');
+    const url = await blobUrlOf(pf.file);
+    if (g !== playGen) return;
+    npFromP2P(pf);
+    audio.src = url;
+    audio.play().catch(() => {});
+  } catch (e) { toast('Não consegui tocar: ' + ((e && e.message) || 'erro'), 'err'); }
+}
+async function dlP2P(pf) {
+  const base = webseedBase(pf, true);
+  if (base) {
+    const url = (base.endsWith('/') ? base : base + '/') + encPath(pf.file.path);
+    const t = { id: 'p2pd:' + pf.id, src: 'ia', item: '__p2p__', name: pf.file.path || pf.name, url,
+      title: pf.name.replace(/^.*\//, '').replace(/\.\w+$/, '').replace(/_/g, ' '),
+      artist: (pf.torrent.name || 'Torrent P2P') + ' · P2P', art: '', duration: 0, plays: 0, size: pf.size };
+    catalog.set(t.id, t);
+    enqueueDl(t.id);
+    return;
+  }
+  try {
+    toast('P2P: montando arquivo para download...');
+    const url = await blobUrlOf(pf.file);
+    const a = document.createElement('a');
+    a.href = url; a.download = pf.name.replace(/^.*\//, '');
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    toast('Download P2P iniciado: ' + pf.name, 'ok');
+  } catch (e) { toast('Erro no download P2P: ' + ((e && e.message) || 'erro'), 'err'); }
+}
+function p2pCard(it) {
+  const t = it.torrent, pct = Math.round((t.progress || 0) * 100), shown = it.files.slice(0, 30);
+  const audBytes = it.files.reduce((a, f) => a + (f.size || 0), 0);
+  const mixed = audBytes > 0 && audBytes < t.length * 0.25;
+  return `<div class="p2ptor" data-tid="${it.id}">
+    <div class="p2phead"><b title="${esc(it.name)}">${esc(it.name)}</b><button class="ib sm" data-rm="${it.id}" title="Remover" aria-label="Remover torrent">${I.x}</button></div>
+    <div class="bar"><i style="width:${pct}%"></i></div>
+    <div class="p2pmeta"><span>${pct}%</span><span>${t.numPeers || 0} peers</span><span>${fmtMB(t.downloaded || 0)} baixados</span><span>${it.files.length} faixa(s) · ${fmtMB(audBytes)}</span>${mixed ? `<span>torrent total ${fmtMB(t.length)}</span>` : ''}</div>
+    ${shown.length ? `<div class="pfiles">${shown.map(pf => `<div class="pfile">
+        <button class="ib sm" data-playp="${esc(pf.id)}" title="Ouvir" aria-label="Ouvir ${esc(pf.name)}">${I.play}</button>
+        <b title="${esc(pf.name)}">${esc(pf.name.replace(/^.*\//, ''))}</b><span class="pfs">${fmtMB(pf.size)}</span>
+        <button class="ib sm dlb" data-dlp="${esc(pf.id)}" title="Baixar" aria-label="Baixar ${esc(pf.name)}">${I.dl}</button></div>`).join('')}</div>${it.files.length > 30 ? `<p class="pmore">+ ${it.files.length - 30} arquivos de áudio (use “Baixar faixas direto” no modal do álbum).</p>` : ''}` : '<p class="pmore">Nenhum arquivo de áudio neste torrent.</p>'}
+  </div>`;
+}
+const P2P_TAGS = ['Populares', 'Pagode', 'Samba', 'Rap', 'Funk', 'Sertanejo', 'MPB', 'Forró', 'Gospel', 'Jazz', 'Lo-Fi', 'Blues', 'Rock', 'Eletrônica'];
+function renderP2P(q) {
+  head('P2P — álbuns completos', 'Busque um grupo, música ou álbum: baixo o disco inteiro via torrent com webseed do Archive', false);
+  const p2ps = [...p2pItems.values()];
+  view.innerHTML = `<div class="panel">
+      <h3>${I.share} Álbum inteiro com 1 clique</h3>
+      <p class="hint">Digite um <b>grupo, artista, música ou álbum</b>: acho álbuns completos no Acervo Livre e baixo via torrent <b>sem você precisar de arquivo</b>. Cada álbum tem webseed oficial do Archive, então baixa mesmo sem outros peers.</p>
+      <form class="frm big" id="p2pqform"><input id="p2pq" type="search" placeholder="Ex.: samba raiz, jazz, lo-fi, Beethoven..." value="${esc(q)}" autocomplete="off" spellcheck="false" aria-label="Buscar álbum para baixar via P2P"><button class="btn filled" type="submit">${I.disc} Buscar</button></form>
+      <div class="suprow" id="p2pchips">${P2P_TAGS.map((g, i) => `<button class="chip ${!q && i === 0 ? 'active' : ''}" data-pg="${g === 'Populares' ? '' : esc(g)}">${g}</button>`).join('')}</div>
+      <p class="p2phint" id="p2phint" hidden></p>
+      <details class="adv"><summary>Já tenho um magnet ou arquivo .torrent (avançado)</summary>
+        <form class="frm" id="p2pform"><input id="p2pin" placeholder="magnet:?xt=... · https://.../album.torrent · identificador-do-archive.org" spellcheck="false" autocomplete="off" aria-label="Magnet, torrent ou identificador"><button class="btn tonal" type="submit">${I.dl} Adicionar</button></form>
+        <button class="btn ghost" id="p2pfilebtn" type="button">${I.folder} Selecionar arquivo .torrent (ou arraste aqui)</button>
+      </details></div>
+    <h4 class="sub-h" id="p2preshd" hidden></h4><div id="p2presults"></div>
+    <h4 class="sub-h" id="p2ptorshd" ${p2ps.length ? '' : 'hidden'}>Seus torrents (${p2ps.length})</h4>
+    <div id="p2plist">${p2ps.map(p2pCard).join('')}</div>`;
+  const si = $('#p2pq'); let deb = null;
+  si.addEventListener('input', () => {
+    const v = si.value.trim(); clearTimeout(deb);
+    if (!v) { deb = setTimeout(() => p2pRunSearch(''), 350); return; }
+    if (v.length >= 2) deb = setTimeout(() => p2pRunSearch(v), 500);
+  });
+  $('#p2pqform').onsubmit = e => { e.preventDefault(); clearTimeout(deb); const v = si.value.trim(); if (v) p2pRunSearch(v); };
+  $('#p2pchips').onclick = e => {
+    const c = e.target.closest('.chip'); if (!c) return;
+    $$('#p2pchips .chip').forEach(x => x.classList.toggle('active', x === c));
+    si.value = c.dataset.pg || ''; p2pRunSearch(c.dataset.pg || '');
+  };
+  $('#p2pform').onsubmit = e => { e.preventDefault(); const v = $('#p2pin').value.trim(); if (v) { $('#p2pin').value = ''; addP2P(v); } };
+  $('#p2pfilebtn').onclick = () => $('#p2pfile').click();
+  const panel = view.querySelector('.panel');
+  panel.addEventListener('dragover', e => e.preventDefault());
+  panel.addEventListener('drop', e => { e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f && /\.torrent$/i.test(f.name)) addP2P(f); });
+  p2pRunSearch(q);
+}
+const p2pDocs = new Map(), p2pSearchCache = new Map();
+let p2pHomeCache = null, p2pTok = 0;
+function p2pItemOf(doc) {
+  const it = iaItem(doc); it.src = 'p2pitem'; it.id = 'p2pi:' + doc.identifier;
+  p2pDocs.set(it.id, it);
+  return it;
+}
+async function p2pFetchAlbums(q) {
+  if (!q) {
+    if (p2pHomeCache) return p2pHomeCache;
+    const docs = await iaSearchDocs('mediatype:(audio) AND format:(MP3) AND collection:(netlabels OR audio_music)');
+    p2pHomeCache = register(docs.map(p2pItemOf));
+    return p2pHomeCache;
+  }
+  if (p2pSearchCache.has(q)) return p2pSearchCache.get(q);
+  const clause = iaMatchClause(q, false);
+  const [curated, broad] = await Promise.all([
+    iaSearchDocs('mediatype:(audio) AND format:(MP3)' + clause + ' AND collection:(netlabels OR audio_music OR georgeblood OR audio_torrents)').catch(() => []),
+    iaSearchDocs('mediatype:(audio) AND format:(MP3 OR Flac OR Ogg)' + clause).catch(() => [])
+  ]);
+  const docs = curated.slice(), seen = new Set(curated.map(d => d.identifier));
+  for (const d of broad) if (!seen.has(d.identifier)) { seen.add(d.identifier); docs.push(d); }
+  if (!docs.length) {
+    const words = q.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().split(/\s+/).filter(w => w.length > 1);
+    if (words.length > 1) {
+      const rel = words.join(' AND ');
+      docs.push(...await iaSearchDocs('mediatype:(audio) AND format:(MP3 OR Flac OR Ogg) AND (title:(' + rel + ') OR creator:(' + rel + '))').catch(() => []));
+    }
+  }
+  const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const needle = norm(q);
+  const score = d => (norm(d.title) + ' ' + norm(Array.isArray(d.creator) ? d.creator.join(' ') : d.creator)).includes(needle) ? 0 : 1;
+  docs.sort((a, b) => score(a) - score(b));
+  const items = register(docs.slice(0, 36).map(p2pItemOf));
+  p2pSearchCache.set(q, items);
+  return items;
+}
+function paintP2PResults(items, headTxt) {
+  const hd = $('#p2preshd'), box = $('#p2presults'); if (!box) return;
+  if (hd) { hd.hidden = false; hd.textContent = headTxt; }
+  box.innerHTML = items.length ? listHtml(items, 'list') : '<div class="note">Nenhum álbum torrent para esse nome no acervo aberto. Tente o nome do grupo ou do álbum, ou escreva sem acentos.</div>';
+}
+async function p2pAudiusFallback(q, tok) {
+  let list = [];
+  try {
+    const j = await api('/v1/tracks/search?query=' + encodeURIComponent(q) + '&limit=8', 14000);
+    list = (j.data || []).map(normA).filter(Boolean).filter(t => t.streamable).slice(0, 6);
+  } catch {}
+  const box = $('#p2presults'); if (!box || tok !== p2pTok) return;
+  if (!list.length) { box.insertAdjacentHTML('beforeend', '<p class="pmore" style="margin-top:12px">Dicas: tente só o <b>nome do grupo</b>, o <b>nome do álbum</b> ou sem acentos. Bandas de gravadora grande costumam não estar no acervo aberto — para <b>ouvir</b> qualquer coisa use o botão do YouTube no topo.</p>'); return; }
+  register(list);
+  box.insertAdjacentHTML('beforeend', '<h4 class="sub-h">Enquanto isso, no Audius — “' + esc(q) + '” toca na hora (e dá para baixar)</h4>' + listHtml(list, 'list'));
+}
+async function p2pRunSearch(term) {
+  const q = String(term == null ? '' : term).trim(), tok = ++p2pTok;
+  state.q = q;
+  if (qInput.value !== q) qInput.value = q;
+  qClear.hidden = !q;
+  const hd = $('#p2preshd'), box = $('#p2presults');
+  if (!box) { route(); return; }
+  if (!q) {
+    if (hd) { hd.hidden = false; hd.textContent = 'Populares agora — clique em um álbum para ouvir e baixar'; }
+    box.innerHTML = '<div class="mload">Carregando álbuns populares...</div>';
+    try { const items = await p2pFetchAlbums(''); if (tok !== p2pTok) return; paintP2PResults(items, items.length + ' álbuns completos com torrent'); }
+    catch (e) { if (tok === p2pTok) box.innerHTML = '<div class="note err">Não consegui carregar agora (' + esc(e && e.message) + '). Tente de novo.</div>'; }
+    return;
+  }
+  if (hd) { hd.hidden = false; hd.textContent = 'Buscando “' + q + '”...'; }
+  box.innerHTML = '<div class="mload">Procurando álbuns com torrent para “' + esc(q) + '”...</div>';
+  try {
+    const items = await p2pFetchAlbums(q);
+    if (tok !== p2pTok) return;
+    paintP2PResults(items, items.length + ' álbum(ns) para “' + q + '”');
+    if (!items.length) p2pAudiusFallback(q, tok);
+  } catch (e) { if (tok === p2pTok) box.innerHTML = '<div class="note err">Falha na busca (' + esc(e && e.message) + '). Tente novamente.</div>'; }
+}
+function fillP2PSearch(term) {
+  state.view = 'p2p'; syncNav();
+  if ($('#p2pq')) { $('#p2pq').value = term; p2pRunSearch(term); } else { state.q = term; route(); }
+}
+function refreshP2PList() {
+  const list = $('#p2plist'), hd = $('#p2ptorshd');
+  const p2ps = [...p2pItems.values()];
+  if (hd) { hd.hidden = !p2ps.length; hd.textContent = 'Seus torrents (' + p2ps.length + ')'; }
+  if (list) list.innerHTML = p2ps.map(p2pCard).join('');
+  paintXfers();
+}
+function looksLikeTorrent(buf) {
+  if (!buf || buf.byteLength < 100) return false;
+  const all = new TextDecoder('latin1').decode(new Uint8Array(buf));
+  return all[0] === 'd' && all.includes('4:info');
+}
+function fetchTorrentBytes(item) {
+  const path = encodeURIComponent(item.item) + '/' + encodeURIComponent(item.item + '_archive.torrent');
+  const real = IA + '/download/' + path;
+  const targets = [real, IA + '/serve/' + path,
+    'https://corsproxy.io/?url=' + encodeURIComponent(real),
+    'https://api.allorigins.win/raw?url=' + encodeURIComponent(real),
+    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(real)];
+  const tryOne = async (url, ms) => {
+    try { const r = await fetchT(url, ms); if (!r.ok) return null; const buf = await r.arrayBuffer(); return looksLikeTorrent(buf) ? buf : null; } catch (e) { return null; }
+  };
+  return new Promise(resolve => {
+    let pending = targets.length, done = false;
+    targets.forEach((u, i) => tryOne(u, i < 2 ? 20000 : 14000).then(buf => {
+      if (buf && !done) { done = true; resolve(buf); }
+      if (--pending === 0 && !done) resolve(null);
+    }));
+  });
+}
+async function addIATorrent(item, hint) {
+  const say = typeof hint === 'function' ? hint : p2pSayer(hint);
+  say('Puxando o .torrent do álbum (direto + pontes CORS, o que chegar primeiro)...');
+  const buf = await fetchTorrentBytes(item);
+  if (!buf) {
+    say('Nenhuma ponte entregou o .torrent agora. <b>Plano B:</b> abra o link do .torrent, salve e selecione o arquivo aqui.', true);
+    iaTorrentSteps(item, say);
+    return false;
+  }
+  say('Abrindo o torrent — webseed oficial do Archive: baixa mesmo sem peers...');
+  await loadWebTorrent();
+  const file = new File([buf], item.item + '_archive.torrent', { type: 'application/x-bittorrent' });
+  registerP2PTorrent(await addViaClient(p2pClient(), file), say);
+  return true;
+}
+function iaTorrentSteps(item, say) {
+  const torUrl = IA + '/download/' + encodeURIComponent(item.item) + '/' + encodeURIComponent(item.item + '_archive.torrent');
+  say('<b>Plano B</b> — <b>1)</b> <a class="chip" href="' + esc(torUrl) + '" target="_blank" rel="noopener">baixe o .torrent aqui</a> <b>2)</b> <button class="chip" type="button" id="p2ppick2">selecione o arquivo</button><br><span class="pmore">Depois disso o WebTorrent baixa o álbum inteiro via webseed do Archive.</span>', true);
+  const pk = $('#p2ppick2'); if (pk) pk.onclick = () => $('#p2pfile').click();
+}
+async function openP2PItemModal(item) {
+  modal.innerHTML = modalHead(item, item.artist + (item.year ? ' · ' + item.year : '') + ' · Internet Archive') +
+    `<div class="mbar"><button class="btn filled sm" id="p2p-tor">${I.share} Baixar via P2P (torrent)</button><button class="btn ghost sm" id="p2p-http">${I.dl} Baixar faixas direto</button></div>
+    <p class="mmod" id="p2pmodhint" hidden></p><div class="mlist"><div class="mload">Carregando faixas...</div></div>`;
+  openModal();
+  $('#mclose').onclick = closeModal;
+  const list = modal.querySelector('.mlist');
+  try {
+    const r = await fetchT(IA + '/metadata/' + encodeURIComponent(item.item), 16000);
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const d = await r.json();
+    const files = iaAudioFiles(d, /\.(mp3|m4a|ogg|flac)$/i);
+    if (!files.length) { list.innerHTML = '<div class="mempty">Nenhum arquivo de áudio disponível neste item.</div>'; $('#p2p-http').hidden = true; $('#p2p-tor').hidden = true; return; }
+    const hasTor = (d.files || []).some(f => f.name === item.item + '_archive.torrent');
+    const tracks = files.map(f => mkIATrack(item, f));
+    lastModalTracks = tracks;
+    list.innerHTML = tracks.map((t, i) => modalRow(t, i, t.size ? fmtMB(t.size) : '')).join('');
+    const tb = $('#p2p-tor');
+    if (!hasTor) { tb.disabled = true; tb.textContent = 'Sem torrent neste item'; }
+    tb.onclick = async () => {
+      tb.disabled = true;
+      const ok = await addIATorrent(item, $('#p2pmodhint')).catch(e => { const h = $('#p2pmodhint'); if (h) { h.hidden = false; h.textContent = 'Erro: ' + ((e && e.message) || 'falha'); } return false; });
+      if (ok) { closeModal(); toast('Álbum adicionado ao P2P! Veja em Transferências', 'ok'); } else tb.disabled = false;
+    };
+    $('#p2p-http').onclick = () => { tracks.slice(0, 20).forEach(t => enqueueDl(t.id, true)); toast(Math.min(20, tracks.length) + ' faixas na fila' + (tracks.length > 20 ? ' (primeiras 20)' : '')); };
+  } catch (e) { list.innerHTML = '<div class="mempty">Erro ao carregar as faixas. Feche e tente de novo.</div>'; }
+}
+setInterval(() => {
+  if (!p2pItems.size) return;
+  for (const it of p2pItems.values()) {
+    const pct = Math.round((it.torrent.progress || 0) * 100);
+    const ab = it.files.reduce((a, f) => a + (f.size || 0), 0);
+    const mix = ab > 0 && ab < it.torrent.length * 0.25;
+    $$('.p2ptor[data-tid="' + it.id + '"]').forEach(row => {
+      const bar = row.querySelector('.bar i'); if (bar) bar.style.width = pct + '%';
+      const m = row.querySelector('.p2pmeta');
+      if (m) m.innerHTML = `<span>${pct}%</span><span>${it.torrent.numPeers || 0} peers</span><span>${fmtMB(it.torrent.downloaded || 0)} baixados</span><span>${it.files.length} faixa(s) · ${fmtMB(ab)}</span>${mix ? `<span>torrent total ${fmtMB(it.torrent.length)}</span>` : ''}`;
+    });
+  }
+}, 900);
+/* a tela de transferências também atualiza o log/linhas em andamento */
+setInterval(() => { if (state.view === 'transfers' && [...dls.values()].some(d => d.status === 'baixando')) paintXfers(); }, 1000);
+
+/* ---------- YouTube (só ouvir) ---------- */
+function ytEmbed(id) {
+  const watch = 'https://www.youtube.com/watch?v=' + id;
+  const link = `<a class="btn" href="${watch}" target="_blank" rel="noopener" style="display:inline-flex;margin-top:10px;text-decoration:none">Abrir no YouTube</a>`;
+  // Erro 153: o YouTube exige origem http(s) para embed. Em file:// (HTML aberto direto) o player sempre falha.
+  if (location.protocol === 'file:') {
+    const btn = `<a class="btn filled" href="${watch}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;text-decoration:none;padding:10px 18px">Abrir no YouTube</a>`;
+    return `<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-top:12px">
+      <img src="https://i.ytimg.com/vi/${id}/hqdefault.jpg" alt="" style="width:200px;max-width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:12px;background:#000" onerror="this.style.display='none'">
+      <div style="flex:1;min-width:240px"><div style="margin-bottom:10px">${btn}</div>
+      <p class="hint">O player embutido não roda com o arquivo aberto direto (<code>file://</code>, erro 153). Para tocar aqui dentro, abra por <code>http://localhost</code> (<code>python -m http.server</code>) ou hospede o app.</p></div></div>`;
+  }
+  const origin = encodeURIComponent(location.origin);
+  return `<div class="ytframe"><iframe src="https://www.youtube.com/embed/${id}?autoplay=1&rel=0&playsinline=1&origin=${origin}" title="Player do YouTube" referrerpolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe></div>
+    <p class="hint" style="margin-top:8px">Não carregou? Alguns vídeos bloqueiam embed. ${link}</p>`;
+}
+function ytId(u) {
+  const m = String(u || '').match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?[^#\s]*v=|embed\/|shorts\/|live\/)|youtu\.be\/)([\w-]{11})/);
+  if (m) return m[1];
+  const t = String(u || '').trim();
+  return /^[\w-]{11}$/.test(t) ? t : null;
+}
+function openYt() {
+  modal.innerHTML = `<div class="mhead"><div class="mi"><b>Ouvir do YouTube</b><span>embed oficial — sem download</span></div><button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>
+    <div class="mbody"><p class="note"><b>Sobre o YouTube:</b> os termos deles não permitem baixar vídeos/áudios, então aqui você só <b>ouve</b>. Para <b>baixar</b>, use Buscar, Link, Álbuns e P2P — fontes abertas e legais.</p>
+    <form class="frm" id="ytform"><input id="yturl" placeholder="Cole o link do YouTube" spellcheck="false" autocomplete="off" aria-label="Link do YouTube"><button class="btn filled" type="submit">Ouvir</button></form><div id="ytbox"></div></div>`;
+  openModal();
+  $('#mclose').onclick = closeModal;
+  $('#ytform').onsubmit = e => {
+    e.preventDefault();
+    const id = ytId($('#yturl').value), box = $('#ytbox');
+    if (!id) { box.innerHTML = '<p class="note err">Link não reconhecido. Copie o endereço completo do vídeo.</p>'; return; }
+    box.innerHTML = `${ytEmbed(id)}`;
+  };
+}
+$('#ytbtn').onclick = openYt;
+
+/* ---------- configurações (estilo Seal) ---------- */
+function openSettings() {
+  modal.innerHTML = `<div class="mhead"><div class="mi"><b>Configurações</b><span>Ficam salvas neste navegador</span></div><button class="ib" id="mclose" aria-label="Fechar">${I.x}</button></div>
+    <div class="mbody">
+      <label class="field">Modelo do nome do arquivo
+        <select id="cfg-tpl"><option value="artist-title">Artista - Título</option><option value="title-artist">Título - Artista</option><option value="title">Somente Título</option></select></label>
+      <label class="field">Downloads simultâneos
+        <select id="cfg-conc"><option value="1">1 (um por vez)</option><option value="2">2</option><option value="3">3</option><option value="4">4</option></select></label>
+      <div class="tbar"><button class="btn ghost sm" id="cfg-hist">Limpar histórico de baixadas</button><button class="btn ghost sm" id="cfg-favs">Limpar favoritas</button></div>
+    </div>`;
+  openModal();
+  $('#mclose').onclick = closeModal;
+  $('#cfg-tpl').value = cfg.tpl; $('#cfg-conc').value = String(cfg.conc);
+  $('#cfg-tpl').onchange = e => { cfg.tpl = e.target.value; saveCfg(); };
+  $('#cfg-conc').onchange = e => { cfg.conc = +e.target.value || 2; saveCfg(); pump(); };
+  $('#cfg-hist').onclick = () => { lsSet('mt_dls', []); toast('Histórico limpo', 'ok'); };
+  $('#cfg-favs').onclick = () => { lsSet('mt_favs', []); refreshFavUI(); toast('Favoritas limpas', 'ok'); };
+}
+$('#setbtn').onclick = openSettings;
+
+/* ---------- eventos da lista ---------- */
+view.addEventListener('error', e => {
+  const el = e.target;
+  if (el.tagName !== 'IMG') return;
+  el.onerror = null; el.src = PLACE;
+}, true);
+view.addEventListener('click', e => {
+  if (e.target.closest('a')) return;
+  const pp = e.target.closest('[data-playp]');
+  if (pp) { const pf = p2pFiles.get(pp.dataset.playp); if (pf) playP2P(pf); return; }
+  const pd = e.target.closest('[data-dlp]');
+  if (pd) { const pf = p2pFiles.get(pd.dataset.dlp); if (pf) dlP2P(pf); return; }
+  const rm = e.target.closest('[data-rm]');
+  if (rm) { removeP2P(rm.dataset.rm); return; }
+  const el = e.target.closest('[data-id]');
+  if (!el) return;
+  const t = catalog.get(el.dataset.id);
+  if (!t) return;
+  const btn = e.target.closest('[data-act]');
+  let act = btn && btn.dataset.act;
+  if (!act && el.classList.contains('card')) act = isAlbum(t) ? 'open' : 'play';
+  if (act === 'dl') { enqueueDl(t.id); return; }
+  if (act === 'fav') { toggleFav(t); return; }
+  if (act === 'open') { if (t.src === 'p2pitem') openP2PItemModal(t); else openIAModal(t); return; }
+  if (act === 'play') { if (isAlbum(t)) { playTrack(t); return; } pqueue = null; playTrack(t); }
+});
+const p2pFileInput = $('#p2pfile');
+p2pFileInput.onchange = () => {
+  if (p2pFileInput.files && p2pFileInput.files[0]) { addP2P(p2pFileInput.files[0]); p2pFileInput.value = ''; }
+};
+
+/* ---------- busca (header) ---------- */
+let debT = null;
+function applyQuery(v) {
+  state.q = v; state.genre = '';
+  if (/^(https?:\/\/|magnet:)/i.test(v)) { state.view = 'link'; syncNav(); route(); resolveLink(v); return; }
+  if (!['search', 'p2p'].includes(state.view)) { state.view = 'search'; syncNav(); }
+  paintChips();
+  route();
+}
+qInput.addEventListener('input', () => {
+  const v = qInput.value.trim();
+  qClear.hidden = !v; clearTimeout(debT);
+  if (!v) { state.q = ''; if (state.view === 'link') return; route(); return; }
+  if (v.length < 2) return;
+  if (/^(https?:\/\/|magnet:)/i.test(v)) return;       // links: só no Enter, para não disparar a cada tecla
+  debT = setTimeout(() => applyQuery(v), 450);
+});
+qInput.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  clearTimeout(debT);
+  const v = qInput.value.trim();
+  if (v.length >= 2) applyQuery(v);
+});
+qClear.onclick = () => { qInput.value = ''; qClear.hidden = true; state.q = ''; route(); qInput.focus(); };
+
+/* ---------- roteador ---------- */
+function route() {
+  gen++;
+  emptyBox.hidden = true;
+  view.innerHTML = '';
+  const v = state.view, term = state.q || state.genre;
+  $('#srcs').hidden = v !== 'search';
+  $('#chips').hidden = v !== 'search';
+  $('#eras').hidden = !((v === 'search' && term && state.srcf !== 'ov' && state.srcf !== 'audius') || v === 'albums');
+  paintLayoutBtn();
+  if (v === 'favs') {
+    head('Suas favoritas', 'Guardadas neste navegador — ouça e baixe quando quiser', true);
+    state.tracks = getFavs(); register(state.tracks); paintGrid();
+    if (!state.tracks.length) paintEmpty('favs');
+    return;
+  }
+  if (v === 'link') { renderLink(); return; }
+  if (v === 'p2p') { renderP2P(state.q); return; }
+  if (v === 'transfers') { renderTransfers(); return; }
+  if (v === 'albums') { head('Álbuns completos', 'Coletâneas do Audius + álbuns inteiros do Acervo — clique em “Faixas”', true); loadAlbums(); return; }
+  /* v === 'search' */
+  if (term) {
+    head('“' + term + '”', 'Buscando nas fontes selecionadas ao mesmo tempo', true);
+    searchAll(term);
+    return;
+  }
+  if (state.srcf === 'ov') { head('Openverse — Creative Commons', 'Faixas livres do Jamendo, Wikimedia e outras plataformas abertas', true); loadOV(); return; }
+  if (state.srcf === 'ia') { head('Acervo Livre', 'Álbuns livres do Internet Archive — clique em “Faixas” para ver e baixar', true); loadIA(); return; }
+  head('Em alta agora', 'As faixas mais tocadas da semana no Audius — clique para ouvir, baixe o que gostar', true);
+  loadTrending();
+}
+
+window.addEventListener('offline', () => toast('Você ficou offline — os downloads podem falhar', 'err'));
+window.addEventListener('online', () => toast('Conexão voltou!', 'ok'));
+
+(function init() {
+  paintSrcs(); paintChips(); paintEras(); syncNav();
+  $('#np-fav').innerHTML = I.heart;
+  resolveHosts().then(() => { if (!hosts.length) toast('Audius fora do ar — use Acervo, Álbuns, Openverse ou P2P', 'err'); });
+  route();
+})();
+</script>
+</body>
+</html>
